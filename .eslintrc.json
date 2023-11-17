@@ -1,0 +1,43 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "simple-import-sort",
+    "prettier",
+    "no-relative-import-paths"
+  ],
+  "rules": {
+    "prettier/prettier": "error",
+    "no-relative-import-paths/no-relative-import-paths": [
+      "error",
+      {
+        "prefix": "@src",
+        "rootDir": "src"
+      }
+    ],
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          [
+            "^react",
+            "^next",
+            "^@next",
+            "^[a-z]",
+            "@reduxjs"
+          ],
+          [
+            "^@",
+            "^\\.\\.(?!/?$)",
+            "^\\.\\./?$",
+            "^\\./(?=.*/)(?!/?$)",
+            "^\\.(?!/?$)",
+            "^\\./?$"
+          ]
+        ]
+      }
+    ]
+  }
+}
