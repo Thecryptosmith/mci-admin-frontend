@@ -1,13 +1,11 @@
+"use client";
+
 import Dashboard from "@src/app/components/Dashboard";
 
-export default function IndexPage() {
+export default function DashboardPage() {
   return (
     <>
       <Dashboard />
     </>
   );
 }
-
-export const metadata = {
-  title: "MCI Admin panel / Homepage",
-};

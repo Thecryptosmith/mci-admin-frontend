@@ -1,27 +1,12 @@
-import Link from "next/link";
-
-import ChecklistIcon from "@mui/icons-material/Checklist";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import HomeIcon from "@mui/icons-material/Home";
-import LogoutIcon from "@mui/icons-material/Logout";
-import SettingsIcon from "@mui/icons-material/Settings";
-import StarIcon from "@mui/icons-material/Star";
-import SupportIcon from "@mui/icons-material/Support";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { Nav } from "@src/app/components/Nav";
+import Menu from "@src/app/components/Menu/Menu";
 import ThemeRegistry from "@src/app/components/ThemeRegistry/ThemeRegistry";
-import styles from "@src/app/styles/layout.module.css";
-import { Providers } from "@src/lib/providers";
+import { Providers } from "@src/lib/providers/providers";
 
 import "@src/app/styles/globals.css";
 
@@ -31,73 +16,12 @@ export const metadata = {
 
 const DRAWER_WIDTH = 240;
 
-const LINKS = [
-  { text: "Home", href: "/", icon: HomeIcon },
-  { text: "Starred", href: "/starred", icon: StarIcon },
-  { text: "Tasks", href: "/tasks", icon: ChecklistIcon },
-];
-
-const PLACEHOLDER_LINKS = [
-  { text: "Settings", icon: SettingsIcon },
-  { text: "Support", icon: SupportIcon },
-  { text: "Logout", icon: LogoutIcon },
-];
-
 export default function RootLayout(props: React.PropsWithChildren) {
   return (
-    <Providers>
-      <html lang="en">
-        <body>
+    <html lang="en">
+      <body>
+        <Providers>
           <ThemeRegistry>
-            {/*<section className={styles.container}>*/}
-            {/*  <Nav />*/}
-
-            {/*  <header className={styles.header}>*/}
-            {/*    <img src="/logo.svg" className={styles.logo} alt="logo" />*/}
-            {/*  </header>*/}
-
-            {/*  <main className={styles.main}>{props.children}</main>*/}
-
-            {/*  <footer className={styles.footer}>*/}
-            {/*    <span>Learn </span>*/}
-            {/*    <a*/}
-            {/*      className={styles.link}*/}
-            {/*      href="https://reactjs.org/"*/}
-            {/*      target="_blank"*/}
-            {/*      rel="noopener noreferrer"*/}
-            {/*    >*/}
-            {/*      React*/}
-            {/*    </a>*/}
-            {/*    <span>, </span>*/}
-            {/*    <a*/}
-            {/*      className={styles.link}*/}
-            {/*      href="https://redux.js.org/"*/}
-            {/*      target="_blank"*/}
-            {/*      rel="noopener noreferrer"*/}
-            {/*    >*/}
-            {/*      Redux*/}
-            {/*    </a>*/}
-            {/*    <span>, </span>*/}
-            {/*    <a*/}
-            {/*      className={styles.link}*/}
-            {/*      href="https://redux-toolkit.js.org/"*/}
-            {/*      target="_blank"*/}
-            {/*      rel="noopener noreferrer"*/}
-            {/*    >*/}
-            {/*      Redux Toolkit*/}
-            {/*    </a>*/}
-            {/*    ,<span> and </span>*/}
-            {/*    <a*/}
-            {/*      className={styles.link}*/}
-            {/*      href="https://react-redux.js.org/"*/}
-            {/*      target="_blank"*/}
-            {/*      rel="noopener noreferrer"*/}
-            {/*    >*/}
-            {/*      React Redux*/}
-            {/*    </a>*/}
-            {/*  </footer>*/}
-            {/*</section>*/}
-
             <AppBar position="fixed" sx={{ zIndex: 2000 }}>
               <Toolbar sx={{ backgroundColor: "background.paper" }}>
                 <DashboardIcon
@@ -123,32 +47,7 @@ export default function RootLayout(props: React.PropsWithChildren) {
               variant="permanent"
               anchor="left"
             >
-              <Divider />
-              <List>
-                {LINKS.map(({ text, href, icon: Icon }) => (
-                  <ListItem key={href} disablePadding>
-                    <ListItemButton component={Link} href={href}>
-                      <ListItemIcon>
-                        <Icon />
-                      </ListItemIcon>
-                      <ListItemText primary={text} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-              <Divider sx={{ mt: "auto" }} />
-              <List>
-                {PLACEHOLDER_LINKS.map(({ text, icon: Icon }) => (
-                  <ListItem key={text} disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon>
-                        <Icon />
-                      </ListItemIcon>
-                      <ListItemText primary={text} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
+              <Menu />
             </Drawer>
             <Box
               component="main"
@@ -163,8 +62,8 @@ export default function RootLayout(props: React.PropsWithChildren) {
               {props.children}
             </Box>
           </ThemeRegistry>
-        </body>
-      </html>
-    </Providers>
+        </Providers>
+      </body>
+    </html>
   );
 }

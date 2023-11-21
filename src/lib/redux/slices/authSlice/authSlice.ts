@@ -1,5 +1,9 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+import {
+  setAccessToken,
+  setRefreshToken,
+} from "@src/lib/tools/localStorage/token";
 import { SignInRes } from "@src/types/signInRes";
 
 export interface authSliceState {
@@ -8,11 +12,18 @@ export interface authSliceState {
     refreshToken?: string;
     url?: string;
     secretCode?: string;
+    email: string;
   };
 }
 
 const initialState: authSliceState = {
-  user: { accessToken: "", refreshToken: "", url: "", secretCode: "" },
+  user: {
+    accessToken: "",
+    refreshToken: "",
+    url: "",
+    secretCode: "",
+    email: "",
+  },
 };
 
 const authSlice = createSlice({
@@ -20,11 +31,16 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: () => initialState,
-    setUser: (state, action: PayloadAction<SignInRes>) => {
+    setUser: (state, action: PayloadAction<SignInRes & { email: string }>) => {
       state.user.accessToken = action.payload?.accessToken ?? "";
       state.user.refreshToken = action.payload?.refreshToken ?? "";
       state.user.url = action.payload?.url ?? "";
       state.user.secretCode = action.payload?.secretCode ?? "";
+      state.user.email = action.payload.email;
+
+      setAccessToken(action.payload?.accessToken ?? "");
+      setRefreshToken(action.payload?.refreshToken ?? "");
+      localStorage.setItem("email", action.payload?.email ?? "");
     },
   },
 });
