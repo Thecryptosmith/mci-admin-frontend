@@ -2,6 +2,7 @@
 import { createLogger } from "redux-logger";
 
 import { adminApi } from "@src/lib/redux/services/adminApi";
+import { authApi } from "@src/lib/redux/services/authApi";
 
 const middleware = [
   createLogger({
@@ -18,6 +19,7 @@ const middleware = [
     predicate: () => typeof window !== "undefined",
   }),
   adminApi.middleware,
+  authApi.middleware,
 ];
 
 export { middleware };
