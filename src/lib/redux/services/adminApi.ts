@@ -1,19 +1,13 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 
-import { baseApiUrl } from "@src/common/consts/baseApiUrl";
-import { getAccessToken } from "@src/lib/tools/localStorage/token";
+import { baseQueryWithReauth } from "@src/lib/redux/services/baseQueryWithReauth";
 import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 
 export const adminApi = createApi({
   reducerPath: "adminApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: baseApiUrl,
-    prepareHeaders: (headers) => {
-      headers.set("Authorization", `Bearer ${getAccessToken() ?? ""}`);
-    },
-  }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Admins"],
   endpoints: (builder) => ({
     createAdmin: builder.mutation<void, CreateAdminReqPayload>({

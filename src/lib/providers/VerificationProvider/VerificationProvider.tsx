@@ -5,7 +5,12 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { FullScreenLoader } from "@src/app/components/FullScreenLoader/FullScreenLoader";
 import { injectRouter } from "@src/common/globals/globalRouter";
-import { setUser, useDispatch } from "@src/lib/redux";
+import {
+  selectCurrentUser,
+  setUser,
+  useDispatch,
+  useSelector,
+} from "@src/lib/redux";
 import {
   getAccessToken,
   getRefreshToken,
@@ -21,6 +26,7 @@ export const VerificationProvider = (props: Props) => {
   const { children } = props;
 
   const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
 
   const router = useRouter();
   injectRouter(router);
@@ -61,7 +67,7 @@ export const VerificationProvider = (props: Props) => {
 
       setIsInit(true);
     })();
-  }, []);
+  }, [currentUser]);
 
   if (!isInit) {
     return <FullScreenLoader />;
