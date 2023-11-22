@@ -52,6 +52,7 @@ export default function SignIn() {
     }
 
     if (data) {
+      dispatch(setUser({ ...data, email }));
       router.push("/dashboard");
     }
   }, [data, dispatch]);
