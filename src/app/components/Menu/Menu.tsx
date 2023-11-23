@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import ChecklistIcon from "@mui/icons-material/Checklist";
+import Group from "@mui/icons-material/Group";
 import HomeIcon from "@mui/icons-material/Home";
 import Login from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -24,6 +25,7 @@ import { removeTokens } from "@src/lib/tools/localStorage/token";
 const LINKS = [
   { text: "Dashboard", href: "/dashboard", icon: HomeIcon },
   { text: "Admins", href: "/admins", icon: ChecklistIcon },
+  { text: "Users", href: "/users", icon: Group },
 ];
 
 export default function Menu() {
