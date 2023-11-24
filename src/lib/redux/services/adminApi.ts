@@ -6,6 +6,7 @@ import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayl
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { GetUsersQueryParams } from "@src/types/getUsersQueryParams";
 import { GetUsersRes } from "@src/types/getUsersRes";
+import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
 
 export const adminApi = createApi({
   reducerPath: "adminApi",
@@ -55,6 +56,14 @@ export const adminApi = createApi({
       }),
       providesTags: [{ type: "Admin", id: "USERS-LIST" }],
     }),
+
+    getUserForVerification: builder.query<GetUserForVerificationRes, number>({
+      query: (id) => ({
+        url: `/user/verification/${id}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "USER" }],
+    }),
   }),
 });
 
@@ -64,4 +73,5 @@ export const {
   useActivateAdminMutation,
   useInactivateAdminMutation,
   useGetUsersListQuery,
+  useGetUserForVerificationQuery,
 } = adminApi;
