@@ -8,8 +8,6 @@ import Menu from "@src/app/components/Menu/Menu";
 import ThemeRegistry from "@src/app/components/ThemeRegistry/ThemeRegistry";
 import { Providers } from "@src/lib/providers/providers";
 
-import "@src/app/styles/globals.css";
-
 export const metadata = {
   title: "MCI Admin panel",
 };

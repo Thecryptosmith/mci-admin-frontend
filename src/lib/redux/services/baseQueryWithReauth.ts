@@ -6,7 +6,7 @@ import type {
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 
 import { baseApiUrl } from "@src/common/consts/baseApiUrl";
-import { logout, ReduxState, setUser } from "@src/lib/redux";
+import { ReduxState } from "@src/lib/redux";
 import {
   getAccessToken,
   getRefreshToken,
@@ -50,17 +50,18 @@ export const baseQueryWithReauth: BaseQueryFn<
     );
 
     if (refreshResult.data) {
-      api.dispatch(
-        setUser({ ...refreshResult.data, email, refreshToken } as {
+      api.dispatch({
+        type: "auth/setUser",
+        payload: { ...refreshResult.data, email, refreshToken } as {
           email: string;
           accessToken: string;
           refreshToken: string;
-        }),
-      );
+        },
+      });
       result = await baseQuery(args, api, extraOptions);
     } else {
       removeTokens();
-      api.dispatch(logout());
+      api.dispatch({ type: "auth/logout" });
     }
   }
 
