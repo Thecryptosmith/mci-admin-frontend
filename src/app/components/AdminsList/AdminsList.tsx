@@ -11,7 +11,7 @@ import TableCell from "@mui/material/TableCell/TableCell";
 import TableContainer from "@mui/material/TableContainer/TableContainer";
 import TableHead from "@mui/material/TableHead/TableHead";
 import TableRow from "@mui/material/TableRow/TableRow";
-import ErrorAlert from "@src/app/components/ErrorAlert/ErrorAlert";
+import CustomAlert from "@src/app/components/CustomAlert/CustomAlert";
 import { useErrorMessage } from "@src/common/hooks/useErrorMessage";
 import { selectCurrentUser, useSelector } from "@src/lib/redux";
 import {
@@ -103,7 +103,9 @@ export default function AdminsList() {
         </TableContainer>
       )}
 
-      {open && <ErrorAlert isOpen={open} errorMessage={errorMessage} />}
+      {open && (
+        <CustomAlert severity="error" isOpen={open} message={errorMessage} />
+      )}
     </>
   );
 }

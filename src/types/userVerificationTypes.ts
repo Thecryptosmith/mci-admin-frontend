@@ -75,6 +75,7 @@ export type IncidentRecordsType = {
   riskRating: string;
   status: string;
   description: string;
+  updatedAt: string;
   admin: {
     id: number;
     email: string;

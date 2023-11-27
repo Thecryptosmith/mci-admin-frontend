@@ -15,22 +15,22 @@ import ActionForm from "@src/app/components/UserVerification/ActionForm";
 import CardWrapper from "@src/app/components/UserVerification/CardWrapper";
 import UserVerificationStatus from "@src/app/components/UserVerification/UserVerificationStatus";
 import { VerificationStatus } from "@src/common/emuns/VerificationStatusEnum";
-import { UserIdDocumentType } from "@src/types/userVerificationTypes";
+import { UserProofOfAddress } from "@src/types/userVerificationTypes";
 
-type IdDocumentProps = {
-  data: UserIdDocumentType;
-  idDocument: VerificationStatus;
-  setIdDocument: Dispatch<SetStateAction<VerificationStatus>>;
+type ProofOfAddressProps = {
+  data: UserProofOfAddress;
+  proofOfAddress: VerificationStatus;
+  setProofOfAddress: Dispatch<SetStateAction<VerificationStatus>>;
 };
 
-export default function IdDocument({
+export default function ProofOfAddress({
   data,
-  idDocument,
-  setIdDocument,
-}: IdDocumentProps) {
+  proofOfAddress,
+  setProofOfAddress,
+}: ProofOfAddressProps) {
   return (
-    <CardWrapper status={idDocument}>
-      <Typography variant="h6">User ID documents:</Typography>
+    <CardWrapper status={proofOfAddress}>
+      <Typography variant="h6">Proof of Address documents:</Typography>
 
       <Divider sx={{ mb: 2 }} />
 
@@ -59,10 +59,10 @@ export default function IdDocument({
             ))}
           </List>
 
-          <UserVerificationStatus status={idDocument} />
+          <UserVerificationStatus status={proofOfAddress} />
         </div>
 
-        <ActionForm status={idDocument} callback={setIdDocument} />
+        <ActionForm status={proofOfAddress} callback={setProofOfAddress} />
       </Box>
     </CardWrapper>
   );

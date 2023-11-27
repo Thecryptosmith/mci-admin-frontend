@@ -1,15 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import Box from "@mui/material/Box/Box";
+import Button from "@mui/material/Button/Button";
+import Drawer from "@mui/material/Drawer/Drawer";
+import List from "@mui/material/List/List";
+import ListItem from "@mui/material/ListItem/ListItem";
+import Typography from "@mui/material/Typography/Typography";
+import CreateIncident from "@src/app/components/CreateIncident/CreateIncident";
+import CustomAlert from "@src/app/components/CustomAlert/CustomAlert";
 import IdDocument from "@src/app/components/UserVerification/IdDocument";
+import IdDocumentExpiry from "@src/app/components/UserVerification/IdDocumentExpiry";
+import IncidentRecords from "@src/app/components/UserVerification/IncidentRecords";
 import PersonalAddress from "@src/app/components/UserVerification/PersonalAddress";
 import PersonalInfo from "@src/app/components/UserVerification/PersonalInfo";
+import ProofOfAddress from "@src/app/components/UserVerification/ProofOfAddress";
+import ProofOfAddressDate from "@src/app/components/UserVerification/ProofOfAddressDate";
+import SelfieImage from "@src/app/components/UserVerification/SelfieImage";
 import SourceOfFunds from "@src/app/components/UserVerification/SourceOfFunds";
 import TradingActivity from "@src/app/components/UserVerification/TradingActivity";
 import { VerificationStatus } from "@src/common/emuns/VerificationStatusEnum";
-import { useGetUserForVerificationQuery } from "@src/lib/redux/services/adminApi";
+import { useErrorMessage } from "@src/common/hooks/useErrorMessage";
+import {
+  useGetUserForVerificationQuery,
+  useUpdateUserVerificationMutation,
+} from "@src/lib/redux/services/adminApi";
 
 type UserPageProps = {
   params: {
@@ -19,6 +35,10 @@ type UserPageProps = {
 
 export default function UserPage({ params }: UserPageProps) {
   const { data } = useGetUserForVerificationQuery(params.id);
+  const [updateUserVerification, { isLoading, isSuccess, isError, error }] =
+    useUpdateUserVerificationMutation();
+
+  const { errorMessage } = useErrorMessage(error);
 
   const [personalInformationStatus, setPersonalInformationStatus] =
     useState<VerificationStatus>(VerificationStatus.PENDING);
@@ -42,8 +62,14 @@ export default function UserPage({ params }: UserPageProps) {
   const [selfieImage, setSelfieImage] = useState<VerificationStatus>(
     VerificationStatus.PENDING,
   );
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
+  const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false);
+  const [isCreateIncidentOpen, setIsCreateIncidentOpen] =
+    useState<boolean>(false);
 
-  useEffect(() => {
+  const isFirstSubmitClick = useRef(true);
+
+  useLayoutEffect(() => {
     if (data) {
       setPersonalInformationStatus(
         data.userVerification.personalInformationStatus,
@@ -59,7 +85,23 @@ export default function UserPage({ params }: UserPageProps) {
     }
   }, [data]);
 
-  console.log({
+  useEffect(() => {
+    if (
+      personalInformationStatus === VerificationStatus.PENDING ||
+      personalAddressStatus === VerificationStatus.PENDING ||
+      sourceOfFundsStatus === VerificationStatus.PENDING ||
+      tradingActivityStatus === VerificationStatus.PENDING ||
+      idDocument === VerificationStatus.PENDING ||
+      idDocumentExpiry === VerificationStatus.PENDING ||
+      proofOfAddress === VerificationStatus.PENDING ||
+      proofOfAddressDate === VerificationStatus.PENDING ||
+      selfieImage === VerificationStatus.PENDING
+    ) {
+      setIsSubmitDisabled(true);
+    } else {
+      setIsSubmitDisabled(false);
+    }
+  }, [
     personalInformationStatus,
     personalAddressStatus,
     sourceOfFundsStatus,
@@ -69,48 +111,207 @@ export default function UserPage({ params }: UserPageProps) {
     proofOfAddress,
     proofOfAddressDate,
     selfieImage,
-  });
+  ]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      setIsAlertOpen(true);
+    }
+
+    if (isError) {
+      setIsAlertOpen(true);
+    }
+  }, [isSuccess, isError]);
+
+  const handleSubmit = async () => {
+    if (isFirstSubmitClick.current) {
+      isFirstSubmitClick.current = false;
+      handleOpenCreateIncident();
+
+      return;
+    }
+
+    const payload = {
+      id: params.id,
+      personalInformationStatus,
+      personalAddressStatus,
+      sourceOfFundsStatus,
+      tradingActivityStatus,
+      idDocument,
+      idDocumentExpiry,
+      proofOfAddress,
+      proofOfAddressDate,
+      selfieImage,
+    };
+
+    await updateUserVerification(payload);
+  };
+
+  const handleOpenCreateIncident = () => {
+    setIsCreateIncidentOpen(true);
+  };
 
   return (
     <>
-      {data && (
-        <Box
+      <Box>
+        {data && (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              width: "calc(100% - 220px)",
+              paddingBottom: "70px",
+            }}
+          >
+            <IncidentRecords data={data.incidentRecords} />
+
+            <PersonalInfo
+              data={data}
+              personalInformationStatus={personalInformationStatus}
+              setPersonalInformationStatus={setPersonalInformationStatus}
+            />
+
+            <SelfieImage
+              data={data.selfieImage}
+              selfieImage={selfieImage}
+              setSelfieImage={setSelfieImage}
+            />
+
+            <PersonalAddress
+              data={data.personalInformation}
+              personalAddressStatus={personalAddressStatus}
+              setPersonalAddressStatus={setPersonalAddressStatus}
+            />
+
+            <SourceOfFunds
+              data={data.questionnaire}
+              sourceOfFundsStatus={sourceOfFundsStatus}
+              setSourceOfFundsStatus={setSourceOfFundsStatus}
+            />
+
+            <TradingActivity
+              data={data}
+              tradingActivityStatus={tradingActivityStatus}
+              setTradingActivityStatus={setTradingActivityStatus}
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 2,
+              }}
+            >
+              <IdDocument
+                data={data.userIdDocument}
+                idDocument={idDocument}
+                setIdDocument={setIdDocument}
+              />
+
+              <IdDocumentExpiry
+                data={data.userIdDocument}
+                idDocumentExpiry={idDocumentExpiry}
+                setIdDocumentExpiry={setIdDocumentExpiry}
+              />
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: 2,
+              }}
+            >
+              <ProofOfAddress
+                data={data.userProofOfAddress}
+                proofOfAddress={proofOfAddress}
+                setProofOfAddress={setProofOfAddress}
+              />
+
+              <ProofOfAddressDate
+                data={data.userProofOfAddress}
+                proofOfAddressDate={proofOfAddressDate}
+                setProofOfAddressDate={setProofOfAddressDate}
+              />
+            </Box>
+
+            <Box
+              sx={{
+                position: "fixed",
+                bottom: 0,
+                left: 0,
+                width: "100%",
+                height: "70px",
+                bgcolor: "white",
+                padding: "10px 0",
+              }}
+            >
+              <Button
+                variant={"contained"}
+                sx={{ width: "100%", height: "100%" }}
+                onClick={handleSubmit}
+                disabled={isSubmitDisabled || isLoading}
+              >
+                Submit
+              </Button>
+            </Box>
+          </Box>
+        )}
+
+        <Drawer
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
+            width: 220,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: 220,
+              boxSizing: "border-box",
+              top: ["48px", "56px", "64px"],
+              height: "auto",
+              bottom: 0,
+            },
           }}
+          variant="permanent"
+          anchor="right"
         >
-          <PersonalInfo
-            data={data}
-            personalInformationStatus={personalInformationStatus}
-            setPersonalInformationStatus={setPersonalInformationStatus}
-          />
+          <List sx={{ px: 2 }}>
+            <ListItem disablePadding>
+              <Typography variant="overline" sx={{ fontWeight: 500 }}>
+                Actions
+              </Typography>
+            </ListItem>
 
-          <PersonalAddress
-            data={data}
-            personalAddressStatus={personalAddressStatus}
-            setPersonalAddressStatus={setPersonalAddressStatus}
-          />
+            <ListItem>
+              <Button variant={"contained"} onClick={handleOpenCreateIncident}>
+                Create incident
+              </Button>
+            </ListItem>
+          </List>
+        </Drawer>
+      </Box>
 
-          <SourceOfFunds
-            data={data}
-            sourceOfFundsStatus={sourceOfFundsStatus}
-            setSourceOfFundsStatus={setSourceOfFundsStatus}
-          />
+      {isCreateIncidentOpen && (
+        <CreateIncident
+          userId={params.id}
+          open={isCreateIncidentOpen}
+          setOpen={setIsCreateIncidentOpen}
+        />
+      )}
 
-          <TradingActivity
-            data={data}
-            tradingActivityStatus={tradingActivityStatus}
-            setTradingActivityStatus={setTradingActivityStatus}
-          />
+      {isSuccess && isAlertOpen && (
+        <CustomAlert
+          severity="success"
+          isOpen={isAlertOpen}
+          message="User verification succesfully updated"
+        />
+      )}
 
-          <IdDocument
-            data={data}
-            idDocument={idDocument}
-            setIdDocument={setIdDocument}
-          />
-        </Box>
+      {isError && isAlertOpen && (
+        <CustomAlert
+          severity="error"
+          isOpen={isAlertOpen}
+          message={errorMessage}
+        />
       )}
     </>
   );
