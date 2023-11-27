@@ -7,10 +7,10 @@ import ActionForm from "@src/app/components/UserVerification/ActionForm";
 import CardWrapper from "@src/app/components/UserVerification/CardWrapper";
 import UserVerificationStatus from "@src/app/components/UserVerification/UserVerificationStatus";
 import { VerificationStatus } from "@src/common/emuns/VerificationStatusEnum";
-import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
+import { PersonalInformationType } from "@src/types/userVerificationTypes";
 
 type PersonalAddressProps = {
-  data: GetUserForVerificationRes;
+  data: PersonalInformationType;
   personalAddressStatus: VerificationStatus;
   setPersonalAddressStatus: Dispatch<SetStateAction<VerificationStatus>>;
 };
@@ -35,19 +35,19 @@ export default function PersonalAddress({
       >
         <div>
           <Typography variant="body1">
-            <b>Address Line 1:</b> {data.personalInformation.addressLine1}
+            <b>Address Line 1:</b> {data.addressLine1}
           </Typography>
 
           <Typography variant="body1">
-            <b>Address Line 2:</b> {data.personalInformation.addressLine2}
+            <b>Address Line 2:</b> {data.addressLine2}
           </Typography>
 
           <Typography variant="body1">
-            <b>Country:</b> {data.personalInformation.addressLine1}
+            <b>Country:</b> {data.addressLine1}
           </Typography>
 
           <Typography variant="body1">
-            <b>Post Code:</b> {data.personalInformation.postCode}
+            <b>Post Code:</b> {data.postCode}
           </Typography>
 
           <UserVerificationStatus status={personalAddressStatus} />

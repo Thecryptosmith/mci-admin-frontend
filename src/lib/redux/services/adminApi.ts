@@ -4,8 +4,10 @@ import { baseQueryWithReauth } from "@src/lib/redux/services/baseQueryWithReauth
 import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
+import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
 import { GetUsersQueryParams } from "@src/types/getUsersQueryParams";
 import { GetUsersRes } from "@src/types/getUsersRes";
+import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificationReqPayload";
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
 
 export const adminApi = createApi({
@@ -64,6 +66,29 @@ export const adminApi = createApi({
       }),
       providesTags: [{ type: "Admin", id: "USER" }],
     }),
+
+    updateUserVerification: builder.mutation<
+      void,
+      UpdateUserVerificationReqPayload
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/user/verification/${id}`,
+        method: "PATCH",
+        body,
+      }),
+    }),
+
+    createIncidentRecord: builder.mutation<
+      void,
+      CreateIncidentRecordReqPayload
+    >({
+      query: (body) => ({
+        url: "/incident-records",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "USER" }],
+    }),
   }),
 });
 
@@ -74,4 +99,6 @@ export const {
   useInactivateAdminMutation,
   useGetUsersListQuery,
   useGetUserForVerificationQuery,
+  useUpdateUserVerificationMutation,
+  useCreateIncidentRecordMutation,
 } = adminApi;

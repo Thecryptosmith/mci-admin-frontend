@@ -15,22 +15,22 @@ import ActionForm from "@src/app/components/UserVerification/ActionForm";
 import CardWrapper from "@src/app/components/UserVerification/CardWrapper";
 import UserVerificationStatus from "@src/app/components/UserVerification/UserVerificationStatus";
 import { VerificationStatus } from "@src/common/emuns/VerificationStatusEnum";
-import { UserIdDocumentType } from "@src/types/userVerificationTypes";
+import { SelfieImageType } from "@src/types/userVerificationTypes";
 
-type IdDocumentProps = {
-  data: UserIdDocumentType;
-  idDocument: VerificationStatus;
-  setIdDocument: Dispatch<SetStateAction<VerificationStatus>>;
+type SelfieImageProps = {
+  data: SelfieImageType;
+  selfieImage: VerificationStatus;
+  setSelfieImage: Dispatch<SetStateAction<VerificationStatus>>;
 };
 
-export default function IdDocument({
+export default function SelfieImage({
   data,
-  idDocument,
-  setIdDocument,
-}: IdDocumentProps) {
+  selfieImage,
+  setSelfieImage,
+}: SelfieImageProps) {
   return (
-    <CardWrapper status={idDocument}>
-      <Typography variant="h6">User ID documents:</Typography>
+    <CardWrapper status={selfieImage}>
+      <Typography variant="h6">Selfie Image:</Typography>
 
       <Divider sx={{ mb: 2 }} />
 
@@ -43,26 +43,24 @@ export default function IdDocument({
       >
         <div>
           <List dense={false}>
-            {data.files.map((file, index) => (
-              <ListItem key={file.id}>
-                <ListItemAvatar>
-                  <Avatar>
-                    <ImageIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText primary={`#${index + 1}`} sx={{ mr: 2 }} />
+            <ListItem>
+              <ListItemAvatar>
+                <Avatar>
+                  <ImageIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary="Image" sx={{ mr: 2 }} />
 
-                <Link href={file.key} target="_blank">
-                  <Button variant="outlined">View</Button>
-                </Link>
-              </ListItem>
-            ))}
+              <Link href={data.key} target="_blank">
+                <Button variant="outlined">View</Button>
+              </Link>
+            </ListItem>
           </List>
 
-          <UserVerificationStatus status={idDocument} />
+          <UserVerificationStatus status={selfieImage} />
         </div>
 
-        <ActionForm status={idDocument} callback={setIdDocument} />
+        <ActionForm status={selfieImage} callback={setSelfieImage} />
       </Box>
     </CardWrapper>
   );

@@ -7,10 +7,10 @@ import ActionForm from "@src/app/components/UserVerification/ActionForm";
 import CardWrapper from "@src/app/components/UserVerification/CardWrapper";
 import UserVerificationStatus from "@src/app/components/UserVerification/UserVerificationStatus";
 import { VerificationStatus } from "@src/common/emuns/VerificationStatusEnum";
-import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
+import { QuestionnaireType } from "@src/types/userVerificationTypes";
 
 type SourceOfFundsProps = {
-  data: GetUserForVerificationRes;
+  data: QuestionnaireType;
   sourceOfFundsStatus: VerificationStatus;
   setSourceOfFundsStatus: Dispatch<SetStateAction<VerificationStatus>>;
 };
@@ -35,19 +35,19 @@ export default function SourceOfFunds({
       >
         <div>
           <Typography variant="body1">
-            <b>Employment Status:</b> {data.questionnaire.employmentStatus}
+            <b>Employment Status:</b> {data.employmentStatus}
           </Typography>
 
           <Typography variant="body1">
-            <b>Employer:</b> {data.questionnaire.employer}
+            <b>Employer:</b> {data.employer}
           </Typography>
 
           <Typography variant="body1">
-            <b>Income:</b> {data.questionnaire.income}
+            <b>Income:</b> {data.income}
           </Typography>
 
           <Typography variant="body1">
-            <b>Source of Funds (Trading):</b> {data.questionnaire.sourceOfFunds}
+            <b>Source of Funds (Trading):</b> {data.sourceOfFunds}
           </Typography>
 
           <UserVerificationStatus status={sourceOfFundsStatus} />

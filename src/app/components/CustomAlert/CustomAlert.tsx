@@ -4,48 +4,50 @@ import * as React from "react";
 import { useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
-import Alert from "@mui/material/Alert/Alert";
+import Alert, { AlertColor } from "@mui/material/Alert/Alert";
 import IconButton from "@mui/material/IconButton/IconButton";
 import Snackbar from "@mui/material/Snackbar/Snackbar";
 
-type ErrorAlertProps = {
+type CustomAlertProps = {
+  severity: AlertColor;
   isOpen: boolean;
-  errorMessage: string;
+  message: string;
 };
 
-export default function ErrorAlert({
+export default function CustomAlert({
+  severity = "info",
   isOpen = false,
-  errorMessage,
-}: ErrorAlertProps) {
+  message,
+}: CustomAlertProps) {
   const [open, setOpen] = useState<boolean>(isOpen);
 
-  const handleErrorClose = () => {
+  const handleAlertClose = () => {
     setOpen(false);
   };
 
-  const errorAction = (
-    <React.Fragment>
+  const alertAction = (
+    <>
       <IconButton
         size="small"
         aria-label="close"
         color="inherit"
-        onClick={handleErrorClose}
+        onClick={handleAlertClose}
       >
         <CloseIcon fontSize="small" />
       </IconButton>
-    </React.Fragment>
+    </>
   );
 
   return (
     <Snackbar
       open={open}
       autoHideDuration={6000}
-      anchorOrigin={{ horizontal: "right", vertical: "top" }}
+      anchorOrigin={{ horizontal: "center", vertical: "top" }}
       style={{ top: "80px" }}
-      onClose={handleErrorClose}
+      onClose={handleAlertClose}
     >
-      <Alert severity="error" action={errorAction}>
-        {errorMessage}
+      <Alert severity={severity} action={alertAction}>
+        {message}
       </Alert>
     </Snackbar>
   );

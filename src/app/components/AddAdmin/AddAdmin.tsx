@@ -11,7 +11,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-import ErrorAlert from "@src/app/components/ErrorAlert/ErrorAlert";
+import CustomAlert from "@src/app/components/CustomAlert/CustomAlert";
 import { useErrorMessage } from "@src/common/hooks/useErrorMessage";
 import { useCreateAdminMutation } from "@src/lib/redux/services/adminApi";
 
@@ -21,7 +21,7 @@ export default function AddAdmin() {
   const [password, setPassword] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
 
-  const [createAdmin, { data, error }] = useCreateAdminMutation();
+  const [createAdmin, { error }] = useCreateAdminMutation();
 
   const { errorMessage } = useErrorMessage(error);
 
@@ -107,7 +107,9 @@ export default function AddAdmin() {
         </Dialog>
       </Box>
 
-      {open && <ErrorAlert isOpen={open} errorMessage={errorMessage} />}
+      {open && (
+        <CustomAlert severity="error" isOpen={open} message={errorMessage} />
+      )}
     </>
   );
 }
