@@ -1,6 +1,6 @@
 "use client";
 
-import Dashboard from "@src/app/components/Dashboard";
+import Dashboard from "@src/app/components/Dashboard/Dashboard";
 
 export default function DashboardPage() {
   return (
