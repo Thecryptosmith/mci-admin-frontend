@@ -7,6 +7,8 @@ import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
 import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
 import { GetOrdersRes } from "@src/types/getOrdersRes";
+import { GetTokensQueryParams } from "@src/types/getTokensQueryParams";
+import { GetTokensRes } from "@src/types/getTokensRes";
 import { GetUsersQueryParams } from "@src/types/getUsersQueryParams";
 import { GetUsersRes } from "@src/types/getUsersRes";
 import {
@@ -98,17 +100,32 @@ export const adminApi = createApi({
     }),
 
     getOrders: builder.query<GetOrdersRes, GetOrdersQueryParams>({
-      query: ({ orderStatuses, limit, offset }) => {
+      query: ({
+        orderStatuses,
+        limit,
+        offset,
+        startDate,
+        endDate,
+        orderTypes,
+      }) => {
         const queryParams = new URLSearchParams();
 
-        if (orderStatuses) {
+        if (orderStatuses && orderStatuses.length > 0) {
           orderStatuses.forEach((status) => {
             queryParams.append("orderStatuses", status);
           });
         }
 
-        queryParams.set("limit", `${limit}`);
-        queryParams.set("offset", `${offset}`);
+        if (orderTypes && orderTypes.length > 0) {
+          orderTypes.forEach((type) => {
+            queryParams.append("orderTypes", type);
+          });
+        }
+
+        startDate && queryParams.set("startDate", startDate);
+        endDate && queryParams.set("endDate", endDate);
+        limit && queryParams.set("limit", `${limit}`);
+        (offset || offset === 0) && queryParams.set("offset", `${offset}`);
 
         return {
           url: "/order",
@@ -142,6 +159,22 @@ export const adminApi = createApi({
       }),
       providesTags: [{ type: "Admin", id: "SELL-ORDER" }],
     }),
+
+    getTokens: builder.query<GetTokensRes, GetTokensQueryParams>({
+      query: ({ limit, offset, search }) => {
+        const queryParams = new URLSearchParams();
+
+        search && queryParams.set("search", search);
+        limit && queryParams.set("limit", `${limit}`);
+        (offset || offset === 0) && queryParams.set("offset", `${offset}`);
+
+        return {
+          url: "/token/get-tokens-for-order",
+          method: "GET",
+          params: queryParams,
+        };
+      },
+    }),
   }),
 });
 
@@ -158,4 +191,5 @@ export const {
   useGetExchangeOrderQuery,
   useGetBuyOrderQuery,
   useGetSellOrderQuery,
+  useGetTokensQuery,
 } = adminApi;

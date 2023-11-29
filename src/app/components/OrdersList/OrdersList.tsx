@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import Box from "@mui/material/Box/Box";
@@ -19,6 +19,7 @@ import TableRow from "@mui/material/TableRow/TableRow";
 import OrderFilters from "@src/app/components/OrderFilters/OrderFilters";
 import { OrderStatusEnum } from "@src/common/emuns/OrderStatusEnum";
 import { useGetOrdersQuery } from "@src/lib/redux/services/adminApi";
+import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -44,15 +45,24 @@ export default function OrdersList() {
   const [offset, setOffset] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [page, setPage] = useState<number>(0);
+  const [payload, setPayload] = useState<GetOrdersQueryParams | null>(null);
 
-  const { data } = useGetOrdersQuery({
-    orderStatuses: [
-      OrderStatusEnum.PENDING_ADMIN_APPROVAL,
-      OrderStatusEnum.COMPLETED,
-    ],
-    offset,
-    limit,
-  });
+  const { data } = useGetOrdersQuery(
+    {
+      ...payload,
+      offset,
+      limit,
+    },
+    {
+      skip: !payload,
+    },
+  );
+
+  useEffect(() => {
+    setPayload({
+      orderStatuses: [OrderStatusEnum.PENDING_ADMIN_APPROVAL],
+    });
+  }, []);
 
   const handleChangePage = (nextPage: number) => {
     setPage(nextPage);
@@ -73,11 +83,11 @@ export default function OrdersList() {
           display: "flex",
           flexDirection: "column",
           gap: 2,
-          width: "calc(100% - 220px)",
+          width: "calc(100% - 320px)",
           paddingBottom: "70px",
         }}
       >
-        {data && (
+        {data ? (
           <Paper elevation={3} sx={{ p: 1 }}>
             <TableContainer>
               <Table sx={{ minWidth: 650 }} aria-label="orders table">
@@ -150,14 +160,16 @@ export default function OrdersList() {
               }}
             />
           </Paper>
+        ) : (
+          <div>No data</div>
         )}
 
         <Drawer
           sx={{
-            width: 220,
+            width: 320,
             flexShrink: 0,
             "& .MuiDrawer-paper": {
-              width: 220,
+              width: 320,
               boxSizing: "border-box",
               top: ["48px", "56px", "64px"],
               height: "auto",
@@ -167,7 +179,7 @@ export default function OrdersList() {
           variant="permanent"
           anchor="right"
         >
-          <OrderFilters />
+          <OrderFilters setPayload={setPayload} />
         </Drawer>
       </Box>
     </>
