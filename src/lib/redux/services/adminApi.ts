@@ -5,8 +5,17 @@ import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
+import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
+import { GetOrdersRes } from "@src/types/getOrdersRes";
+import { GetTokensQueryParams } from "@src/types/getTokensQueryParams";
+import { GetTokensRes } from "@src/types/getTokensRes";
 import { GetUsersQueryParams } from "@src/types/getUsersQueryParams";
 import { GetUsersRes } from "@src/types/getUsersRes";
+import {
+  BuyOrderType,
+  ExchangeOrderType,
+  SellOrderType,
+} from "@src/types/OrderTypes";
 import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificationReqPayload";
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
 
@@ -89,6 +98,97 @@ export const adminApi = createApi({
       }),
       invalidatesTags: [{ type: "Admin", id: "USER" }],
     }),
+
+    getOrders: builder.query<GetOrdersRes, GetOrdersQueryParams>({
+      query: ({
+        orderStatuses,
+        limit,
+        offset,
+        startDate,
+        endDate,
+        orderTypes,
+        incomingAssets,
+        outgoingAssets,
+      }) => {
+        const queryParams = new URLSearchParams();
+
+        if (orderStatuses && orderStatuses.length > 0) {
+          orderStatuses.forEach((status) => {
+            queryParams.append("orderStatuses", status);
+          });
+        }
+
+        if (orderTypes && orderTypes.length > 0) {
+          orderTypes.forEach((type) => {
+            queryParams.append("orderTypes", type);
+          });
+        }
+
+        if (incomingAssets && incomingAssets.length > 0) {
+          incomingAssets.forEach((asset) => {
+            queryParams.append("incomingAssets", asset);
+          });
+        }
+
+        if (outgoingAssets && outgoingAssets.length > 0) {
+          outgoingAssets.forEach((asset) => {
+            queryParams.append("outgoingAssets", asset);
+          });
+        }
+
+        startDate && queryParams.set("startDate", startDate);
+        endDate && queryParams.set("endDate", endDate);
+        limit && queryParams.set("limit", `${limit}`);
+        (offset || offset === 0) && queryParams.set("offset", `${offset}`);
+
+        return {
+          url: "/order",
+          method: "GET",
+          params: queryParams,
+        };
+      },
+      providesTags: [{ type: "Admin", id: "ORDERS" }],
+    }),
+
+    getExchangeOrder: builder.query<ExchangeOrderType, number>({
+      query: (id) => ({
+        url: `/order/exchange/${id}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "EXCHANGE-ORDER" }],
+    }),
+
+    getBuyOrder: builder.query<BuyOrderType, number>({
+      query: (id) => ({
+        url: `/order/buy/${id}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "BUY-ORDER" }],
+    }),
+
+    getSellOrder: builder.query<SellOrderType, number>({
+      query: (id) => ({
+        url: `/order/sell/${id}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "SELL-ORDER" }],
+    }),
+
+    getTokens: builder.query<GetTokensRes, GetTokensQueryParams>({
+      query: ({ limit, offset, search }) => {
+        const queryParams = new URLSearchParams();
+
+        search && queryParams.set("search", search);
+        limit && queryParams.set("limit", `${limit}`);
+        (offset || offset === 0) && queryParams.set("offset", `${offset}`);
+
+        return {
+          url: "/token/get-tokens-for-order",
+          method: "GET",
+          params: queryParams,
+        };
+      },
+    }),
   }),
 });
 
@@ -101,4 +201,9 @@ export const {
   useGetUserForVerificationQuery,
   useUpdateUserVerificationMutation,
   useCreateIncidentRecordMutation,
+  useGetOrdersQuery,
+  useGetExchangeOrderQuery,
+  useGetBuyOrderQuery,
+  useGetSellOrderQuery,
+  useGetTokensQuery,
 } = adminApi;

@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import ChecklistIcon from "@mui/icons-material/Checklist";
 import Group from "@mui/icons-material/Group";
+import Groups3Icon from "@mui/icons-material/Groups3";
 import HomeIcon from "@mui/icons-material/Home";
+import ListIcon from "@mui/icons-material/List";
 import Login from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Divider from "@mui/material/Divider";
@@ -24,8 +25,9 @@ import { removeTokens } from "@src/lib/tools/localStorage/token";
 
 const LINKS = [
   { text: "Dashboard", href: "/dashboard", icon: HomeIcon },
-  { text: "Admins", href: "/admins", icon: ChecklistIcon },
+  { text: "Admins", href: "/admins", icon: Groups3Icon },
   { text: "Users", href: "/users", icon: Group },
+  { text: "Orders", href: "/orders", icon: ListIcon },
 ];
 
 export default function Menu() {
