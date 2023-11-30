@@ -107,6 +107,8 @@ export const adminApi = createApi({
         startDate,
         endDate,
         orderTypes,
+        incomingAssets,
+        outgoingAssets,
       }) => {
         const queryParams = new URLSearchParams();
 
@@ -119,6 +121,18 @@ export const adminApi = createApi({
         if (orderTypes && orderTypes.length > 0) {
           orderTypes.forEach((type) => {
             queryParams.append("orderTypes", type);
+          });
+        }
+
+        if (incomingAssets && incomingAssets.length > 0) {
+          incomingAssets.forEach((asset) => {
+            queryParams.append("incomingAssets", asset);
+          });
+        }
+
+        if (outgoingAssets && outgoingAssets.length > 0) {
+          outgoingAssets.forEach((asset) => {
+            queryParams.append("outgoingAssets", asset);
           });
         }
 

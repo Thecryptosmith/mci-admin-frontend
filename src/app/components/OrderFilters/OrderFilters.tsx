@@ -16,35 +16,62 @@ import OrderTypesSelect from "@src/app/components/OrderFilters/OrderTypesSelect"
 import { OrderStatusEnum } from "@src/common/emuns/OrderStatusEnum";
 import { OrderTypeEnum } from "@src/common/emuns/OrderTypeEnum";
 import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
+import { TokenData } from "@src/types/getTokensRes";
 
 import "dayjs/locale/en-gb";
 
 type OrderFiltersProps = {
   setPayload: Dispatch<SetStateAction<GetOrdersQueryParams | null>>;
+  setPage: Dispatch<SetStateAction<number>>;
+  setOffset: Dispatch<SetStateAction<number>>;
 };
 
-export default function OrderFilters({ setPayload }: OrderFiltersProps) {
+export default function OrderFilters({
+  setPayload,
+  setPage,
+  setOffset,
+}: OrderFiltersProps) {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [orderStatuses, setOrderStatuses] = React.useState<string[]>([
     OrderStatusEnum.PENDING_ADMIN_APPROVAL,
   ]);
   const [orderTypes, setOrderTypes] = React.useState<string[]>([]);
+  const [selectedIncomingAssets, setSelectedIncomingAssets] = useState<
+    TokenData[]
+  >([]);
+  const [selectedOutgoingAssets, setSelectedOutgoingAssets] = useState<
+    TokenData[]
+  >([]);
+
+  const convertAssetsToPayload = (assets: TokenData[]) => {
+    return assets.map((asset) => asset.slug);
+  };
 
   const handleFilter = () => {
+    setPage(0);
+    setOffset(0);
     setPayload((prevState) => ({
       ...prevState,
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
       orderStatuses: orderStatuses as OrderStatusEnum[],
       orderTypes: orderTypes as OrderTypeEnum[],
+      incomingAssets: convertAssetsToPayload(selectedIncomingAssets),
+      outgoingAssets: convertAssetsToPayload(selectedOutgoingAssets),
     }));
   };
 
   const handleResetFilters = () => {
+    setPage(0);
+    setOffset(0);
     setPayload({});
+    setStartDate(null);
+    setEndDate(null);
     setOrderStatuses([]);
     setOrderTypes([]);
+    setSelectedIncomingAssets([]);
+    setSelectedOutgoingAssets([]);
   };
 
   return (
@@ -91,7 +118,19 @@ export default function OrderFilters({ setPayload }: OrderFiltersProps) {
         </ListItem>
 
         <ListItem>
-          <AssetsSelect label={"Incoming assets"} />
+          <AssetsSelect
+            label={"Incoming assets"}
+            selectedValues={selectedIncomingAssets}
+            setSelectedValues={setSelectedIncomingAssets}
+          />
+        </ListItem>
+
+        <ListItem>
+          <AssetsSelect
+            label={"Outgoing assets"}
+            selectedValues={selectedOutgoingAssets}
+            setSelectedValues={setSelectedOutgoingAssets}
+          />
         </ListItem>
       </List>
 

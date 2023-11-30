@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
@@ -18,10 +18,6 @@ import { TokenData } from "@src/types/getTokensRes";
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-type AssetsSelectProps = {
-  label: string;
-};
-
 const currencies: TokenData[] = Object.values(CurrencyCode).map(
   (currency, i) => {
     return {
@@ -32,14 +28,23 @@ const currencies: TokenData[] = Object.values(CurrencyCode).map(
   },
 );
 
-export default function AssetsSelect({ label }: AssetsSelectProps) {
+type AssetsSelectProps = {
+  label: string;
+  selectedValues: TokenData[];
+  setSelectedValues: Dispatch<SetStateAction<TokenData[]>>;
+};
+
+export default function AssetsSelect({
+  label,
+  selectedValues,
+  setSelectedValues,
+}: AssetsSelectProps) {
   const [params, setParams] = useState<GetTokensQueryParams | null>({
     limit: 10,
   });
   const [open, setOpen] = useState(false);
   const [assets, setAssets] = useState<TokenData[]>(currencies);
   const [inputValue, setInputValue] = useState("");
-  const [selectedValues, setSelectedValues] = useState<TokenData[]>([]);
   const debouncedInputValue = useDebounce<string>(inputValue, 500);
 
   const { data, isLoading, isFetching } = useGetTokensQuery(params!, {
@@ -120,7 +125,7 @@ export default function AssetsSelect({ label }: AssetsSelectProps) {
       filterOptions={(x) => x}
       loading={loading}
       renderTags={(value) => (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, p: 1 }}>
           {value.map((option) => (
             <Chip
               key={option.id}
@@ -149,12 +154,12 @@ export default function AssetsSelect({ label }: AssetsSelectProps) {
           InputProps={{
             ...params.InputProps,
             endAdornment: (
-              <React.Fragment>
+              <>
                 {loading ? (
                   <CircularProgress color="inherit" size={20} />
                 ) : null}
                 {params.InputProps.endAdornment}
-              </React.Fragment>
+              </>
             ),
           }}
         />

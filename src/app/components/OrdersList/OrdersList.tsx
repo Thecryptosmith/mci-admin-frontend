@@ -55,6 +55,7 @@ export default function OrdersList() {
     },
     {
       skip: !payload,
+      refetchOnMountOrArgChange: true,
     },
   );
 
@@ -179,7 +180,11 @@ export default function OrdersList() {
           variant="permanent"
           anchor="right"
         >
-          <OrderFilters setPayload={setPayload} />
+          <OrderFilters
+            setPayload={setPayload}
+            setPage={setPage}
+            setOffset={setOffset}
+          />
         </Drawer>
       </Box>
     </>
