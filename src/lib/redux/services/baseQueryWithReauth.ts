@@ -6,7 +6,6 @@ import type {
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 
 import { baseApiUrl } from "@src/common/consts/baseApiUrl";
-import { ReduxState } from "@src/lib/redux";
 import {
   getAccessToken,
   getRefreshToken,
@@ -35,8 +34,7 @@ export const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
   const refreshToken = getRefreshToken();
-  const state = api.getState() as ReduxState;
-  const email = state.auth.user.email;
+  const email = localStorage.getItem("email") ?? "";
 
   if (result.error && result.error.status === 401 && refreshToken) {
     const refreshResult = await baseQuery(

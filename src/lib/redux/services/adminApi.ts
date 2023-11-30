@@ -5,6 +5,7 @@ import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
+import { GetOrderLogsRes } from "@src/types/getOrderLogsRes";
 import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
 import { GetOrdersRes } from "@src/types/getOrdersRes";
 import { GetTokensQueryParams } from "@src/types/getTokensQueryParams";
@@ -15,7 +16,8 @@ import {
   BuyOrderType,
   ExchangeOrderType,
   SellOrderType,
-} from "@src/types/OrderTypes";
+} from "@src/types/orderTypes";
+import { ProcessOrderReqPayload } from "@src/types/processOrderReqPayload";
 import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificationReqPayload";
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
 
@@ -189,6 +191,28 @@ export const adminApi = createApi({
         };
       },
     }),
+
+    getOrderLogs: builder.query<GetOrderLogsRes, number>({
+      query: (id) => ({
+        url: `/order/logs/${id}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "ORDER-LOGS" }],
+    }),
+
+    processOrder: builder.mutation<void, ProcessOrderReqPayload>({
+      query: ({ id, type, ...body }) => ({
+        url: `/order/process/${type}/${id}`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [
+        { type: "Admin", id: "ORDER-LOGS" },
+        { type: "Admin", id: "EXCHANGE-ORDER" },
+        { type: "Admin", id: "BUY-ORDER" },
+        { type: "Admin", id: "SELL-ORDER" },
+      ],
+    }),
   }),
 });
 
@@ -206,4 +230,6 @@ export const {
   useGetBuyOrderQuery,
   useGetSellOrderQuery,
   useGetTokensQuery,
+  useGetOrderLogsQuery,
+  useProcessOrderMutation,
 } = adminApi;
