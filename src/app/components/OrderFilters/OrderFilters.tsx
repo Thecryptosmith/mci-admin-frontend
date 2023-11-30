@@ -84,10 +84,7 @@ export default function OrderFilters({
         </ListItem>
 
         <ListItem>
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            adapterLocale="en-gb"
-          >
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <DateTimePicker
                 label="From"

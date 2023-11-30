@@ -118,7 +118,7 @@ export default function OrdersList() {
                         {order.orderType}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {order.date}
+                        {new Date(order.date).toLocaleString()}
                       </StyledTableCell>
                       <StyledTableCell align="center">
                         {order.status}
