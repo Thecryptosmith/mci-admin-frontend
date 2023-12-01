@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import Box from "@mui/material/Box/Box";
 import Button from "@mui/material/Button";
@@ -18,6 +18,7 @@ import TablePagination from "@mui/material/TablePagination/TablePagination";
 import TableRow from "@mui/material/TableRow/TableRow";
 import OrderFilters from "@src/app/components/OrderFilters/OrderFilters";
 import { OrderStatusEnum } from "@src/common/emuns/OrderStatusEnum";
+import { selectNotificationData, useSelector } from "@src/lib/redux";
 import { useGetOrdersQuery } from "@src/lib/redux/services/adminApi";
 import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
 
@@ -46,6 +47,10 @@ export default function OrdersList() {
   const [limit, setLimit] = useState<number>(10);
   const [page, setPage] = useState<number>(0);
   const [payload, setPayload] = useState<GetOrdersQueryParams | null>(null);
+
+  const router = useRouter();
+
+  const notificationData = useSelector(selectNotificationData);
 
   const { data } = useGetOrdersQuery(
     {
@@ -102,6 +107,7 @@ export default function OrdersList() {
                     <TableCell align="center">Incoming Amount</TableCell>
                     <TableCell align="center">Outgoing Asset</TableCell>
                     <TableCell align="center">Outgoing Amount</TableCell>
+                    <TableCell align="center">Is now viewing by</TableCell>
                     <TableCell align="center">Action</TableCell>
                   </TableRow>
                 </TableHead>
@@ -136,11 +142,21 @@ export default function OrdersList() {
                         {order.outgoingAmount}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        <Link
-                          href={`/orders/${order.orderType}/${order.orderId}`}
+                        {notificationData?.body[order.orderId]
+                          ?.reviewingEmail ?? ""}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        <Button
+                          disabled={!!notificationData?.body[order.orderId]}
+                          variant="contained"
+                          onClick={() => {
+                            router.push(
+                              `/orders/${order.orderType}/${order.orderId}`,
+                            );
+                          }}
                         >
-                          <Button>View</Button>
-                        </Link>
+                          View
+                        </Button>
                       </StyledTableCell>
                     </StyledTableRow>
                   ))}

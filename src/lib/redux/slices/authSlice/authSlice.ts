@@ -4,6 +4,7 @@ import {
   setAccessToken,
   setRefreshToken,
 } from "@src/lib/tools/localStorage/token";
+import { NotificationData } from "@src/types/notificationData";
 import { SignInRes } from "@src/types/signInRes";
 
 export interface authSliceState {
@@ -14,6 +15,7 @@ export interface authSliceState {
     secretCode?: string;
     email: string;
   };
+  notificationData: NotificationData | null;
 }
 
 const initialState: authSliceState = {
@@ -24,6 +26,7 @@ const initialState: authSliceState = {
     secretCode: "",
     email: "",
   },
+  notificationData: null,
 };
 
 const authSlice = createSlice({
@@ -42,9 +45,16 @@ const authSlice = createSlice({
       setRefreshToken(action.payload?.refreshToken ?? "");
       localStorage.setItem("email", action.payload?.email ?? "");
     },
+    setNotificationData: (state, action: PayloadAction<NotificationData>) => {
+      state.notificationData = action.payload;
+    },
+    resetNotificationData: (state) => {
+      state.notificationData = null;
+    },
   },
 });
 
-export const { setUser, logout } = authSlice.actions;
+export const { setUser, logout, setNotificationData, resetNotificationData } =
+  authSlice.actions;
 
 export const authReducer = authSlice.reducer;

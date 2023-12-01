@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import Box from "@mui/material/Box/Box";
 import BankAccountInfo from "@src/app/components/BankAccountInfo/BankAccountInfo";
 import CompanyWalletInfo from "@src/app/components/CompanyWalletInfo/CompanyWalletInfo";
@@ -17,7 +20,15 @@ type SellOrderPageProps = {
 };
 
 export default function SellOrderPage({ params }: SellOrderPageProps) {
-  const { data } = useGetSellOrderQuery(params.id);
+  const router = useRouter();
+
+  const { data, isError } = useGetSellOrderQuery(params.id);
+
+  useEffect(() => {
+    if (isError) {
+      router.push("/orders");
+    }
+  }, [isError]);
 
   return (
     <>

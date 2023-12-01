@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import Box from "@mui/material/Box";
 import CompanyWalletInfo from "@src/app/components/CompanyWalletInfo/CompanyWalletInfo";
 import OrderActions from "@src/app/components/OrderActions/OrderActions";
@@ -18,7 +21,15 @@ type ExchangeOrderPageProps = {
 };
 
 export default function ExchangeOrderPage({ params }: ExchangeOrderPageProps) {
-  const { data } = useGetExchangeOrderQuery(params.id);
+  const router = useRouter();
+
+  const { data, isError } = useGetExchangeOrderQuery(params.id);
+
+  useEffect(() => {
+    if (isError) {
+      router.push("/orders");
+    }
+  }, [isError]);
 
   return (
     <>
