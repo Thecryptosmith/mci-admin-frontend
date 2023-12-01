@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import Box from "@mui/material/Box/Box";
 import BankAccountInfo from "@src/app/components/BankAccountInfo/BankAccountInfo";
 import OrderActions from "@src/app/components/OrderActions/OrderActions";
@@ -8,8 +11,13 @@ import OrderLogs from "@src/app/components/OrderLogs/OrderLogs";
 import PriceInfo from "@src/app/components/PriceInfo/PriceInfo";
 import TokenInfo from "@src/app/components/TokenInfo/TokenInfo";
 import UserWalletInfo from "@src/app/components/UserWalletInfo/UserWalletInfo";
+import { NotificationTypeEnum } from "@src/common/emuns/NotificationTypeEnum";
 import { OrderTypeEnum } from "@src/common/emuns/OrderTypeEnum";
-import { useGetBuyOrderQuery } from "@src/lib/redux/services/adminApi";
+import useExitPrompt from "@src/common/hooks/useExitPrompt";
+import {
+  useGetBuyOrderQuery,
+  useSendReviewingNotificationMutation,
+} from "@src/lib/redux/services/adminApi";
 
 type BuyOrderPageProps = {
   params: {
@@ -18,7 +26,38 @@ type BuyOrderPageProps = {
 };
 
 export default function BuyOrderPage({ params }: BuyOrderPageProps) {
-  const { data } = useGetBuyOrderQuery(params.id);
+  const router = useRouter();
+
+  const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false);
+
+  const { data, isSuccess, isError } = useGetBuyOrderQuery(params.id, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const [sendReviewingNotification] = useSendReviewingNotificationMutation();
+
+  useEffect(() => {
+    setShowExitPrompt(true);
+
+    return () => {
+      setShowExitPrompt(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isSuccess) {
+      sendReviewingNotification({
+        id: Number(params.id),
+        reviewingNotificationType: NotificationTypeEnum.START_REVIEWING_ORDER,
+      });
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (isError) {
+      router.push("/orders");
+    }
+  }, [isError]);
 
   return (
     <>

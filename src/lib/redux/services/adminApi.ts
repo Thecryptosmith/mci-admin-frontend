@@ -18,6 +18,7 @@ import {
   SellOrderType,
 } from "@src/types/orderTypes";
 import { ProcessOrderReqPayload } from "@src/types/processOrderReqPayload";
+import { SendReviewingNotificationReqPayload } from "@src/types/sendReviewingNotificationReqPayload";
 import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificationReqPayload";
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
 
@@ -213,6 +214,17 @@ export const adminApi = createApi({
         { type: "Admin", id: "SELL-ORDER" },
       ],
     }),
+
+    sendReviewingNotification: builder.mutation<
+      void,
+      SendReviewingNotificationReqPayload
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/order/notification/reviewing/${id}`,
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -232,4 +244,5 @@ export const {
   useGetTokensQuery,
   useGetOrderLogsQuery,
   useProcessOrderMutation,
+  useSendReviewingNotificationMutation,
 } = adminApi;
