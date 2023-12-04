@@ -1,10 +1,13 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
+import { NotificationTypeEnum } from "@src/common/emuns/NotificationTypeEnum";
+import { NotificationContext } from "@src/common/globals/Contexts";
 import { getSocket } from "@src/common/globals/socket";
 import { setNotificationData, useDispatch } from "@src/lib/redux";
 import { getAccessToken } from "@src/lib/tools/localStorage/token";
+import { ChangedStatusOrdersNotification } from "@src/types/changedStatusOrderNotificationBody";
 import { NotificationData } from "@src/types/notificationData";
 
 type OrdersLayoutProps = {
@@ -13,6 +16,8 @@ type OrdersLayoutProps = {
 
 export default function OrdersLayout({ children }: OrdersLayoutProps) {
   const dispatch = useDispatch();
+  const [notifyData, setNotifyData] =
+    useState<ChangedStatusOrdersNotification | null>(null);
 
   // socket
   useEffect(() => {
@@ -32,10 +37,17 @@ export default function OrdersLayout({ children }: OrdersLayoutProps) {
       console.log("WS Error");
     };
 
-    const onNotification = (data: NotificationData) => {
+    const onNotification = (
+      data: NotificationData | ChangedStatusOrdersNotification,
+    ) => {
       console.log("onNotification log");
-      dispatch(setNotificationData(data));
-      localStorage.setItem("notificationData", JSON.stringify(data));
+
+      if (data.type !== NotificationTypeEnum.ORDER_STATUS_UPDATED) {
+        dispatch(setNotificationData(data as NotificationData));
+        localStorage.setItem("notificationData", JSON.stringify(data));
+      } else {
+        setNotifyData(data as ChangedStatusOrdersNotification);
+      }
     };
 
     socket.on("connect", onConnect);
@@ -50,5 +62,9 @@ export default function OrdersLayout({ children }: OrdersLayoutProps) {
     };
   }, []);
 
-  return <>{children}</>;
+  return (
+    <NotificationContext.Provider value={notifyData}>
+      {children}
+    </NotificationContext.Provider>
+  );
 }

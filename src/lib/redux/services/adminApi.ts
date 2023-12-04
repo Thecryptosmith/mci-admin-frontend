@@ -18,6 +18,7 @@ import {
   SellOrderType,
 } from "@src/types/orderTypes";
 import { ProcessOrderReqPayload } from "@src/types/processOrderReqPayload";
+import { SendChangeOrderStatusNotificationReqPayload } from "@src/types/sendChangeOrderStatusNotificationReqPayload";
 import { SendReviewingNotificationReqPayload } from "@src/types/sendReviewingNotificationReqPayload";
 import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificationReqPayload";
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
@@ -225,6 +226,17 @@ export const adminApi = createApi({
         body,
       }),
     }),
+
+    sendChangeOrderStatusNotification: builder.mutation<
+      void,
+      SendChangeOrderStatusNotificationReqPayload
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/order/notification/order-change-status/${id}`,
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -245,4 +257,5 @@ export const {
   useGetOrderLogsQuery,
   useProcessOrderMutation,
   useSendReviewingNotificationMutation,
+  useSendChangeOrderStatusNotificationMutation,
 } = adminApi;

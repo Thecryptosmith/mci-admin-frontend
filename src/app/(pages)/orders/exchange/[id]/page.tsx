@@ -11,8 +11,13 @@ import OrderLogs from "@src/app/components/OrderLogs/OrderLogs";
 import PriceInfo from "@src/app/components/PriceInfo/PriceInfo";
 import TokenInfo from "@src/app/components/TokenInfo/TokenInfo";
 import UserWalletInfo from "@src/app/components/UserWalletInfo/UserWalletInfo";
+import { NotificationTypeEnum } from "@src/common/emuns/NotificationTypeEnum";
 import { OrderTypeEnum } from "@src/common/emuns/OrderTypeEnum";
-import { useGetExchangeOrderQuery } from "@src/lib/redux/services/adminApi";
+import useExitPrompt from "@src/common/hooks/useExitPrompt";
+import {
+  useGetExchangeOrderQuery,
+  useSendReviewingNotificationMutation,
+} from "@src/lib/redux/services/adminApi";
 
 type ExchangeOrderPageProps = {
   params: {
@@ -23,7 +28,28 @@ type ExchangeOrderPageProps = {
 export default function ExchangeOrderPage({ params }: ExchangeOrderPageProps) {
   const router = useRouter();
 
-  const { data, isError } = useGetExchangeOrderQuery(params.id);
+  const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false);
+
+  const { data, isSuccess, isError } = useGetExchangeOrderQuery(params.id);
+
+  const [sendReviewingNotification] = useSendReviewingNotificationMutation();
+
+  useEffect(() => {
+    setShowExitPrompt(true);
+
+    return () => {
+      setShowExitPrompt(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isSuccess) {
+      sendReviewingNotification({
+        id: Number(params.id),
+        reviewingNotificationType: NotificationTypeEnum.START_REVIEWING_ORDER,
+      });
+    }
+  }, [isSuccess]);
 
   useEffect(() => {
     if (isError) {

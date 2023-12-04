@@ -7,9 +7,9 @@ import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 
 import { baseApiUrl } from "@src/common/consts/baseApiUrl";
 import {
+  clearLocalStorage,
   getAccessToken,
   getRefreshToken,
-  removeTokens,
 } from "@src/lib/tools/localStorage/token";
 
 const baseQuery = fetchBaseQuery({
@@ -58,7 +58,7 @@ export const baseQueryWithReauth: BaseQueryFn<
       });
       result = await baseQuery(args, api, extraOptions);
     } else {
-      removeTokens();
+      clearLocalStorage();
       api.dispatch({ type: "auth/logout" });
     }
   }

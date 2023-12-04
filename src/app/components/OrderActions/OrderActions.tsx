@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -8,7 +8,10 @@ import DialogTitle from "@mui/material/DialogTitle/DialogTitle";
 import { OrderStatusEnum } from "@src/common/emuns/OrderStatusEnum";
 import { OrderStatusForActionEnum } from "@src/common/emuns/OrderStatusForActionEnum";
 import { OrderTypeEnum } from "@src/common/emuns/OrderTypeEnum";
-import { useProcessOrderMutation } from "@src/lib/redux/services/adminApi";
+import {
+  useProcessOrderMutation,
+  useSendChangeOrderStatusNotificationMutation,
+} from "@src/lib/redux/services/adminApi";
 import { ProcessOrderActionEnum } from "@src/types/processOrderActionEnum";
 
 type OrderActionsProps = {
@@ -30,6 +33,17 @@ export default function OrderActions({
   ).includes(orderStatus);
 
   const [processOrder] = useProcessOrderMutation();
+  const [sendChangeOrderStatusNotification] =
+    useSendChangeOrderStatusNotificationMutation();
+
+  useEffect(() => {
+    if (orderStatus !== OrderStatusEnum.PENDING_ADMIN_APPROVAL) {
+      sendChangeOrderStatusNotification({
+        id,
+        newStatus: orderStatus,
+      });
+    }
+  }, [orderStatus]);
 
   const handleClose = () => {
     setOpen(false);
