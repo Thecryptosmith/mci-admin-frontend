@@ -7,8 +7,11 @@ export const setAccessToken = (token: string) =>
 export const getRefreshToken = () => localStorage.getItem(refreshTokenKey);
 export const setRefreshToken = (token: string) =>
   localStorage.setItem(refreshTokenKey, token);
-export const removeTokens = () => {
+export const clearLocalStorage = () => {
   localStorage.removeItem(accessTokenKey);
   localStorage.removeItem(refreshTokenKey);
   localStorage.removeItem("email");
+  localStorage.removeItem("notificationData");
+  localStorage.removeItem("prevPath");
+  localStorage.removeItem("ally-supports-cache");
 };

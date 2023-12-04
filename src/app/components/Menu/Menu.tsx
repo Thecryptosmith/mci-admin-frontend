@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -21,7 +22,10 @@ import {
   useDispatch,
   useSelector,
 } from "@src/lib/redux";
-import { removeTokens } from "@src/lib/tools/localStorage/token";
+import {
+  clearLocalStorage,
+  getAccessToken,
+} from "@src/lib/tools/localStorage/token";
 
 const LINKS = [
   { text: "Dashboard", href: "/dashboard", icon: HomeIcon },
@@ -31,18 +35,31 @@ const LINKS = [
 ];
 
 export default function Menu() {
+  const [token, setToken] = useState<string>("");
+
   const user = useSelector(selectCurrentUser);
   const dispatch = useDispatch();
   const router = useRouter();
+
+  useEffect(() => {
+    const accessToken = getAccessToken();
+
+    if (accessToken) {
+      setToken(accessToken);
+    } else {
+      setToken("");
+    }
+  }, [user]);
+
   const logoutHandler = () => {
     dispatch(logout());
-    removeTokens();
+    clearLocalStorage();
     router.push("/auth/sign-in");
   };
 
   return (
     <>
-      {user?.accessToken ? (
+      {token ? (
         <>
           <Divider />
           <List>

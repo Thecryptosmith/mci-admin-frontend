@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 
 import { FullScreenLoader } from "@src/app/components/FullScreenLoader/FullScreenLoader";
 import { NotificationTypeEnum } from "@src/common/emuns/NotificationTypeEnum";
@@ -38,10 +38,6 @@ export const VerificationProvider = (props: Props) => {
   const [isInit, setIsInit] = useState(false);
   const [pathName, setPathName] = useState("");
 
-  useLayoutEffect(() => {
-    setPathName(localStorage.getItem("prevPath") ?? "");
-  }, []);
-
   useEffect(() => {
     setPathName((prevPath) => {
       const isReviewingPrevPath =
@@ -73,8 +69,6 @@ export const VerificationProvider = (props: Props) => {
         });
       }
 
-      localStorage.setItem("prevPath", prevPath);
-
       return path;
     });
   }, [path]);
@@ -93,9 +87,8 @@ export const VerificationProvider = (props: Props) => {
     const accessToken = getAccessToken();
 
     if (!accessToken && !authPaths.includes(path)) {
-      router.push("/auth/sign-in");
       setIsInit(true);
-      return;
+      redirect("/auth/sign-in");
     }
 
     if (!accessToken && authPaths.includes(path)) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Box from "@mui/material/Box/Box";
@@ -18,9 +18,11 @@ import TablePagination from "@mui/material/TablePagination/TablePagination";
 import TableRow from "@mui/material/TableRow/TableRow";
 import OrderFilters from "@src/app/components/OrderFilters/OrderFilters";
 import { OrderStatusEnum } from "@src/common/emuns/OrderStatusEnum";
+import { NotificationContext } from "@src/common/globals/Contexts";
 import { selectNotificationData, useSelector } from "@src/lib/redux";
 import { useGetOrdersQuery } from "@src/lib/redux/services/adminApi";
 import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
+import { OrderType } from "@src/types/getOrdersRes";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -47,6 +49,8 @@ export default function OrdersList() {
   const [limit, setLimit] = useState<number>(10);
   const [page, setPage] = useState<number>(0);
   const [payload, setPayload] = useState<GetOrdersQueryParams | null>(null);
+  const [orders, setOrders] = useState<OrderType[] | null>(null);
+  const [count, setCount] = useState<number>(0);
 
   const router = useRouter();
 
@@ -63,6 +67,29 @@ export default function OrdersList() {
       refetchOnMountOrArgChange: true,
     },
   );
+
+  const notifyData = useContext(NotificationContext);
+
+  useEffect(() => {
+    if (notifyData && orders) {
+      const updatedOrders = orders.map((order) => {
+        if (order.orderId === +notifyData.body.orderId) {
+          return { ...order, status: notifyData.body.newOrderStatus };
+        }
+
+        return order;
+      });
+
+      setOrders(updatedOrders);
+    }
+  }, [notifyData]);
+
+  useEffect(() => {
+    if (data) {
+      setOrders(data.orders);
+      setCount(data.count);
+    }
+  }, [data]);
 
   useEffect(() => {
     setPayload({
@@ -82,6 +109,18 @@ export default function OrdersList() {
     setOffset(0);
   };
 
+  const isDisabled = (order: OrderType) => {
+    if (notificationData?.body[order.orderId]) {
+      return true;
+    }
+
+    if (notifyData && +notifyData?.body.orderId === order.orderId) {
+      return !payload?.orderStatuses?.includes(notifyData.body.newOrderStatus);
+    }
+
+    return false;
+  };
+
   return (
     <>
       <Box
@@ -93,7 +132,7 @@ export default function OrdersList() {
           paddingBottom: "70px",
         }}
       >
-        {data ? (
+        {orders ? (
           <Paper elevation={3} sx={{ p: 1 }}>
             <TableContainer>
               <Table sx={{ minWidth: 650 }} aria-label="orders table">
@@ -112,10 +151,15 @@ export default function OrdersList() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data.orders.map((order) => (
+                  {orders.map((order) => (
                     <StyledTableRow
                       key={order.orderId}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      sx={{
+                        "&:last-child td, &:last-child th": { border: 0 },
+                        "td, th": {
+                          color: isDisabled(order) ? "#0000004d" : "inherit",
+                        },
+                      }}
                     >
                       <StyledTableCell component="th" scope="row">
                         {order.orderId}
@@ -147,7 +191,7 @@ export default function OrdersList() {
                       </StyledTableCell>
                       <StyledTableCell align="center">
                         <Button
-                          disabled={!!notificationData?.body[order.orderId]}
+                          disabled={isDisabled(order)}
                           variant="contained"
                           onClick={() => {
                             router.push(
@@ -169,7 +213,7 @@ export default function OrdersList() {
             <TablePagination
               rowsPerPageOptions={[10]}
               component="div"
-              count={data.count}
+              count={count}
               rowsPerPage={limit}
               page={page}
               onPageChange={(event, page) => {
