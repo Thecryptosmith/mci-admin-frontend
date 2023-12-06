@@ -3,6 +3,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "@src/lib/redux/services/baseQueryWithReauth";
 import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
+import { ChangeUserWalletStatusReqPayload } from "@src/types/changeUserWalletStatusReqPayload";
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
 import { GetOrderLogsRes } from "@src/types/getOrderLogsRes";
@@ -12,6 +13,8 @@ import { GetTokensQueryParams } from "@src/types/getTokensQueryParams";
 import { GetTokensRes } from "@src/types/getTokensRes";
 import { GetUsersQueryParams } from "@src/types/getUsersQueryParams";
 import { GetUsersRes } from "@src/types/getUsersRes";
+import { GetUserWalletsQueryParams } from "@src/types/getUserWalletsQueryParams";
+import { GetUserWalletsRes } from "@src/types/getUserWalletsRes";
 import {
   BuyOrderType,
   ExchangeOrderType,
@@ -237,6 +240,42 @@ export const adminApi = createApi({
         body,
       }),
     }),
+
+    getUserWallets: builder.query<GetUserWalletsRes, GetUserWalletsQueryParams>(
+      {
+        query: ({ status, limit, offset }) => {
+          const queryParams = new URLSearchParams();
+
+          if (status && status.length > 0) {
+            status.forEach((stat) => {
+              queryParams.append("status", stat);
+            });
+          }
+
+          limit && queryParams.set("limit", `${limit}`);
+          (offset || offset === 0) && queryParams.set("offset", `${offset}`);
+
+          return {
+            url: "/user-wallet",
+            method: "GET",
+            params: queryParams,
+          };
+        },
+        providesTags: [{ type: "Admin", id: "WALLETS" }],
+      },
+    ),
+
+    changeUserWalletStatus: builder.mutation<
+      void,
+      ChangeUserWalletStatusReqPayload
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/user-wallet/${id}`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "WALLETS" }],
+    }),
   }),
 });
 
@@ -258,4 +297,6 @@ export const {
   useProcessOrderMutation,
   useSendReviewingNotificationMutation,
   useSendChangeOrderStatusNotificationMutation,
+  useGetUserWalletsQuery,
+  useChangeUserWalletStatusMutation,
 } = adminApi;

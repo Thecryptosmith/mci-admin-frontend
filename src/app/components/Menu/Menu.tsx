@@ -10,6 +10,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import ListIcon from "@mui/icons-material/List";
 import Login from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
+import Wallet from "@mui/icons-material/Wallet";
 import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -32,6 +33,7 @@ const LINKS = [
   { text: "Admins", href: "/admins", icon: Groups3Icon },
   { text: "Users", href: "/users", icon: Group },
   { text: "Orders", href: "/orders", icon: ListIcon },
+  { text: "Wallets", href: "/wallets", icon: Wallet },
 ];
 
 export default function Menu() {

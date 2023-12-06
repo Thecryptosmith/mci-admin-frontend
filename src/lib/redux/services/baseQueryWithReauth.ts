@@ -1,3 +1,4 @@
+import { Mutex } from "async-mutex";
 import type {
   BaseQueryFn,
   FetchArgs,
@@ -11,6 +12,8 @@ import {
   getAccessToken,
   getRefreshToken,
 } from "@src/lib/tools/localStorage/token";
+
+const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
   baseUrl: baseApiUrl,
@@ -32,34 +35,47 @@ export const baseQueryWithReauth: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
+  await mutex.waitForUnlock();
+
   let result = await baseQuery(args, api, extraOptions);
   const refreshToken = getRefreshToken();
   const email = localStorage.getItem("email") ?? "";
 
   if (result.error && result.error.status === 401 && refreshToken) {
-    const refreshResult = await baseQuery(
-      {
-        url: "/auth/refresh-access-token",
-        method: "POST",
-        body: { refreshToken },
-      },
-      api,
-      extraOptions,
-    );
+    if (!mutex.isLocked()) {
+      const release = await mutex.acquire();
 
-    if (refreshResult.data) {
-      api.dispatch({
-        type: "auth/setUser",
-        payload: { ...refreshResult.data, email, refreshToken } as {
-          email: string;
-          accessToken: string;
-          refreshToken: string;
-        },
-      });
-      result = await baseQuery(args, api, extraOptions);
+      try {
+        const refreshResult = await baseQuery(
+          {
+            url: "/auth/refresh-access-token",
+            method: "POST",
+            body: { refreshToken },
+          },
+          api,
+          extraOptions,
+        );
+
+        if (refreshResult.data) {
+          api.dispatch({
+            type: "auth/setUser",
+            payload: { ...refreshResult.data, email, refreshToken } as {
+              email: string;
+              accessToken: string;
+              refreshToken: string;
+            },
+          });
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          clearLocalStorage();
+          api.dispatch({ type: "auth/logout" });
+        }
+      } finally {
+        release();
+      }
     } else {
-      clearLocalStorage();
-      api.dispatch({ type: "auth/logout" });
+      await mutex.waitForUnlock();
+      result = await baseQuery(args, api, extraOptions);
     }
   }
 
