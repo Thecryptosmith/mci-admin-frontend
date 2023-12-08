@@ -110,7 +110,7 @@ export default function OrdersList() {
   };
 
   const isDisabled = (order: OrderType) => {
-    if (notificationData?.body[order.orderId]) {
+    if (notificationData?.body?.[order.orderId]) {
       return true;
     }
 
@@ -186,7 +186,7 @@ export default function OrdersList() {
                         {order.outgoingAmount}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {notificationData?.body[order.orderId]
+                        {notificationData?.body?.[order.orderId]
                           ?.reviewingEmail ?? ""}
                       </StyledTableCell>
                       <StyledTableCell align="center">
