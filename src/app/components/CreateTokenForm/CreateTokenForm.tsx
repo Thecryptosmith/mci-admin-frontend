@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Image from "next/image";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -14,7 +15,6 @@ import FormControlLabel from "@mui/material/FormControlLabel/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel/FormLabel";
 import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
-import Link from "@mui/material/Link";
 import List from "@mui/material/List/List";
 import ListItem from "@mui/material/ListItem/ListItem";
 import MenuItem from "@mui/material/MenuItem/MenuItem";
@@ -23,6 +23,8 @@ import RadioGroup from "@mui/material/RadioGroup";
 import Select from "@mui/material/Select/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import AddNetwork from "@src/app/components/AddNetwork/AddNetwork";
+import NetworksList from "@src/app/components/NetworksList/NetworksList";
 import { TokenPairPositionEnum } from "@src/common/emuns/TokenPairPositionEnum";
 import {
   useCreateTokenMutation,
@@ -190,7 +192,7 @@ export default function CreateTokenForm() {
         setShowPairMsg(false);
       })
       .catch((e) => {
-        toast.error(e?.data?.message ?? "Something is wrong");
+        toast.error(JSON.stringify(e?.data?.message));
       });
   };
 
@@ -539,7 +541,18 @@ export default function CreateTokenForm() {
                   >
                     {networksData &&
                       networksData.networks.map((network) => (
-                        <MenuItem key={network.id} value={network.id}>
+                        <MenuItem
+                          key={network.id}
+                          value={network.id}
+                          sx={{ display: "flex", gap: 1 }}
+                        >
+                          <Image
+                            title={network.name}
+                            src={network.logo}
+                            width={16}
+                            height={16}
+                            alt="token logo"
+                          />{" "}
                           {network.name}
                         </MenuItem>
                       ))}
@@ -642,9 +655,11 @@ export default function CreateTokenForm() {
           </ListItem>
 
           <ListItem>
-            <Link href={"/tokens/create"} target="_blank">
-              <Button variant={"contained"}>Add new network</Button>
-            </Link>
+            <AddNetwork />
+          </ListItem>
+
+          <ListItem>
+            <NetworksList />
           </ListItem>
         </List>
       </Drawer>

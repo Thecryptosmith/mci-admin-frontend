@@ -7,6 +7,7 @@ import { ChangeUserWalletStatusReqPayload } from "@src/types/changeUserWalletSta
 import { CoinMarketTokenInfo } from "@src/types/CoinMarketToken";
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
+import { CreateNetworkReqPayload } from "@src/types/createNetworkReqPayload";
 import { CreateTokenReqPayload } from "@src/types/createTokenReqPayload";
 import { GetNetworksListRes } from "@src/types/getNetworksListRes";
 import { GetOrderLogsRes } from "@src/types/getOrderLogsRes";
@@ -338,6 +339,35 @@ export const adminApi = createApi({
       }),
       invalidatesTags: [{ type: "Admin", id: "TOKENS" }],
     }),
+
+    createNetwork: builder.mutation<void, CreateNetworkReqPayload>({
+      query: (body) => ({
+        url: "/network",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "NETWORKS" }],
+    }),
+
+    updateNetwork: builder.mutation<
+      void,
+      { id: number } & CreateNetworkReqPayload
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/network/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "NETWORKS" }],
+    }),
+
+    deleteNetwork: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `/network/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Admin", id: "NETWORKS" }],
+    }),
   }),
 });
 
@@ -367,4 +397,7 @@ export const {
   useSearchPairQuery,
   useGetAllNetworksQuery,
   useCreateTokenMutation,
+  useCreateNetworkMutation,
+  useUpdateNetworkMutation,
+  useDeleteNetworkMutation,
 } = adminApi;
