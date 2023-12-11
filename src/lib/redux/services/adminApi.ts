@@ -7,6 +7,7 @@ import { ChangeUserWalletStatusReqPayload } from "@src/types/changeUserWalletSta
 import { CoinMarketTokenInfo } from "@src/types/CoinMarketToken";
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
+import { CreateTokenReqPayload } from "@src/types/createTokenReqPayload";
 import { GetNetworksListRes } from "@src/types/getNetworksListRes";
 import { GetOrderLogsRes } from "@src/types/getOrderLogsRes";
 import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
@@ -328,6 +329,15 @@ export const adminApi = createApi({
       }),
       providesTags: [{ type: "Admin", id: "NETWORKS" }],
     }),
+
+    createToken: builder.mutation<void, CreateTokenReqPayload>({
+      query: (body) => ({
+        url: "/token-info/create",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "TOKENS" }],
+    }),
   }),
 });
 
@@ -356,4 +366,5 @@ export const {
   useGetDefaultTokenQuery,
   useSearchPairQuery,
   useGetAllNetworksQuery,
+  useCreateTokenMutation,
 } = adminApi;
