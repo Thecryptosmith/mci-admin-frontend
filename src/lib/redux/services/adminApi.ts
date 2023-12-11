@@ -4,11 +4,15 @@ import { baseQueryWithReauth } from "@src/lib/redux/services/baseQueryWithReauth
 import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
 import { ChangeUserWalletStatusReqPayload } from "@src/types/changeUserWalletStatusReqPayload";
+import { CoinMarketTokenInfo } from "@src/types/CoinMarketToken";
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
+import { CreateTokenReqPayload } from "@src/types/createTokenReqPayload";
+import { GetNetworksListRes } from "@src/types/getNetworksListRes";
 import { GetOrderLogsRes } from "@src/types/getOrderLogsRes";
 import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
 import { GetOrdersRes } from "@src/types/getOrdersRes";
+import { GetTokensListRes } from "@src/types/getTokensListRes";
 import { GetTokensQueryParams } from "@src/types/getTokensQueryParams";
 import { GetTokensRes } from "@src/types/getTokensRes";
 import { GetUsersQueryParams } from "@src/types/getUsersQueryParams";
@@ -276,6 +280,64 @@ export const adminApi = createApi({
       }),
       invalidatesTags: [{ type: "Admin", id: "WALLETS" }],
     }),
+
+    getTokensList: builder.query<GetTokensListRes, GetTokensQueryParams>({
+      query: ({ limit, offset, search }) => {
+        const queryParams = new URLSearchParams();
+
+        search && queryParams.set("search", search);
+        limit && queryParams.set("limit", `${limit}`);
+        (offset || offset === 0) && queryParams.set("offset", `${offset}`);
+
+        return {
+          url: "/token-info",
+          method: "GET",
+          params: queryParams,
+        };
+      },
+      providesTags: [{ type: "Admin", id: "TOKENS" }],
+    }),
+
+    searchTokenBySlug: builder.query<CoinMarketTokenInfo, string>({
+      query: (slug) => ({
+        url: `/token-info/search?slug=${slug}`,
+        method: "GET",
+      }),
+    }),
+
+    getDefaultToken: builder.query<{ defaultToken: { id: number } }, void>({
+      query: () => ({
+        url: "/token-info/get-default-token",
+        method: "GET",
+      }),
+    }),
+
+    searchPair: builder.query<
+      { [key: string]: { altname: string; wsname: string } },
+      string
+    >({
+      query: (pair) => ({
+        url: `/token-info/asset-pair/${pair}`,
+        method: "GET",
+      }),
+    }),
+
+    getAllNetworks: builder.query<GetNetworksListRes, void>({
+      query: () => ({
+        url: "/network",
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "NETWORKS" }],
+    }),
+
+    createToken: builder.mutation<void, CreateTokenReqPayload>({
+      query: (body) => ({
+        url: "/token-info/create",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "TOKENS" }],
+    }),
   }),
 });
 
@@ -299,4 +361,10 @@ export const {
   useSendChangeOrderStatusNotificationMutation,
   useGetUserWalletsQuery,
   useChangeUserWalletStatusMutation,
+  useGetTokensListQuery,
+  useSearchTokenBySlugQuery,
+  useGetDefaultTokenQuery,
+  useSearchPairQuery,
+  useGetAllNetworksQuery,
+  useCreateTokenMutation,
 } = adminApi;
