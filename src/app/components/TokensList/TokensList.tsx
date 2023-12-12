@@ -19,6 +19,7 @@ import TablePagination from "@mui/material/TablePagination/TablePagination";
 import TableRow from "@mui/material/TableRow/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import TrendingList from "@src/app/components/TrendingList/TrendingList";
 import { useGetTokensListQuery } from "@src/lib/redux/services/adminApi";
 
 export default function TokensList() {
@@ -186,10 +187,26 @@ export default function TokensList() {
           </ListItem>
 
           <ListItem>
-            <Link href={"/tokens/create"} target="_blank">
-              <Button variant={"contained"}>Add new token</Button>
+            <Link
+              href={"/tokens/create"}
+              target="_blank"
+              style={{ width: "100%" }}
+            >
+              <Button
+                variant={"contained"}
+                color="success"
+                sx={{ width: "100%" }}
+              >
+                Add new token
+              </Button>
             </Link>
           </ListItem>
+
+          {data && (
+            <ListItem>
+              <TrendingList />
+            </ListItem>
+          )}
         </List>
       </Drawer>
     </Box>
