@@ -31,7 +31,7 @@ export default function AddNetwork() {
     setOpen(false);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLDivElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     createNetwork({

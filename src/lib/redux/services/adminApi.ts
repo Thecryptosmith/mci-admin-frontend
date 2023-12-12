@@ -16,6 +16,7 @@ import { GetOrdersRes } from "@src/types/getOrdersRes";
 import { GetTokensListRes } from "@src/types/getTokensListRes";
 import { GetTokensQueryParams } from "@src/types/getTokensQueryParams";
 import { GetTokensRes } from "@src/types/getTokensRes";
+import { GetTrendingTokensRes } from "@src/types/getTrendingTokensRes";
 import { GetUsersQueryParams } from "@src/types/getUsersQueryParams";
 import { GetUsersRes } from "@src/types/getUsersRes";
 import { GetUserWalletsQueryParams } from "@src/types/getUserWalletsQueryParams";
@@ -28,6 +29,7 @@ import {
 import { ProcessOrderReqPayload } from "@src/types/processOrderReqPayload";
 import { SendChangeOrderStatusNotificationReqPayload } from "@src/types/sendChangeOrderStatusNotificationReqPayload";
 import { SendReviewingNotificationReqPayload } from "@src/types/sendReviewingNotificationReqPayload";
+import { UpdateTrendingTokensReqPayload } from "@src/types/updateTrendingTokensReqPayload";
 import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificationReqPayload";
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
 
@@ -368,6 +370,26 @@ export const adminApi = createApi({
       }),
       invalidatesTags: [{ type: "Admin", id: "NETWORKS" }],
     }),
+
+    getTrendingTokens: builder.query<GetTrendingTokensRes, void>({
+      query: () => ({
+        url: "/token-info/trending",
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "TRENDING" }],
+    }),
+
+    updateTrendingTokens: builder.mutation<
+      void,
+      UpdateTrendingTokensReqPayload
+    >({
+      query: (body) => ({
+        url: "/token-info/trending",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "TRENDING" }],
+    }),
   }),
 });
 
@@ -400,4 +422,6 @@ export const {
   useCreateNetworkMutation,
   useUpdateNetworkMutation,
   useDeleteNetworkMutation,
+  useGetTrendingTokensQuery,
+  useUpdateTrendingTokensMutation,
 } = adminApi;
