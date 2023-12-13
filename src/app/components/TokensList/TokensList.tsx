@@ -94,7 +94,8 @@ export default function TokensList() {
                   <TableCell>Name</TableCell>
                   <TableCell align="center">Symbol</TableCell>
                   <TableCell align="center">Kraken Asset Name</TableCell>
-                  <TableCell align="right">Networks</TableCell>
+                  <TableCell align="center">Networks</TableCell>
+                  <TableCell align="right">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -125,7 +126,7 @@ export default function TokensList() {
                     <TableCell align="center">
                       {token.krakenAssetName}
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell align="center">
                       <Box
                         sx={{
                           display: "flex",
@@ -144,6 +145,11 @@ export default function TokensList() {
                           />
                         ))}
                       </Box>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Link href={`/tokens/${token.id}`} target="_blank">
+                        <Button variant="contained">Edit</Button>
+                      </Link>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -14,27 +14,29 @@ import FormControl from "@mui/material/FormControl/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel/FormLabel";
 import Grid from "@mui/material/Grid";
-import InputLabel from "@mui/material/InputLabel";
 import List from "@mui/material/List/List";
 import ListItem from "@mui/material/ListItem/ListItem";
-import MenuItem from "@mui/material/MenuItem/MenuItem";
 import Radio from "@mui/material/Radio/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
-import Select from "@mui/material/Select/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import AddNetwork from "@src/app/components/AddNetwork/AddNetwork";
+import CreateCompanyWallets from "@src/app/components/CreateTokenForm/CreateCompanyWallets/CreateCompanyWallets";
+import EditCompanyWallets from "@src/app/components/CreateTokenForm/EditCompanyWallets/EditCompanyWallets";
 import NetworksList from "@src/app/components/NetworksList/NetworksList";
 import { TokenPairPositionEnum } from "@src/common/emuns/TokenPairPositionEnum";
 import {
   useCreateTokenMutation,
-  useGetAllNetworksQuery,
   useGetDefaultTokenQuery,
+  useGetFullTokenInfoQuery,
   useSearchPairQuery,
   useSearchTokenBySlugQuery,
+  useUpdateTokenMutation,
 } from "@src/lib/redux/services/adminApi";
+import { CompanyWalletForEditType } from "@src/types/getFullTokenInfoRes";
 
 type TokenInfoType = {
+  id?: number;
   coinMarketId: number | string;
   name: string;
   symbol: string;
@@ -60,7 +62,15 @@ const initialTokenInfo: TokenInfoType = {
   stakedCoins: "",
 };
 
-export default function CreateTokenForm() {
+type CreateTokenFormProps = {
+  id?: number;
+  isEdit?: boolean;
+};
+
+export default function CreateTokenForm({
+  id,
+  isEdit = false,
+}: CreateTokenFormProps) {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
   const [searchSlug, setSearchSlug] = useState<string>("");
   const [searchValue, setSearchValue] = useState<string>("");
@@ -74,11 +84,18 @@ export default function CreateTokenForm() {
     useState<TokenPairPositionEnum | null>(null);
   const [walletsCount, setWalletsCount] = useState<number>(1);
   const [showPairMsg, setShowPairMsg] = useState<boolean>(false);
+  const [companyWallets, setCompanyWallets] = useState<
+    CompanyWalletForEditType[]
+  >([]);
+
+  const { data: fullTokenInfo } = useGetFullTokenInfoQuery(id!, {
+    skip: !isEdit || !id,
+  });
 
   const { data, isSuccess, isError, isFetching } = useSearchTokenBySlugQuery(
     searchValue,
     {
-      skip: !searchValue,
+      skip: !searchValue || isEdit,
     },
   );
 
@@ -92,12 +109,48 @@ export default function CreateTokenForm() {
 
   const { data: defaultTokenData } = useGetDefaultTokenQuery();
 
-  const { data: networksData } = useGetAllNetworksQuery();
-
   const [createToken, { isLoading: isCreateTokenLoading }] =
     useCreateTokenMutation();
 
+  const [updateToken] = useUpdateTokenMutation();
+
   useEffect(() => {
+    if (isEdit && fullTokenInfo) {
+      setTokenInfo({
+        id: fullTokenInfo.tokenInfo.id,
+        coinMarketId: fullTokenInfo.tokenInfo.id,
+        name: fullTokenInfo.tokenInfo.name ?? "",
+        symbol: fullTokenInfo.tokenInfo.symbol ?? "",
+        logo: fullTokenInfo.tokenInfo.logo ?? "",
+        dateAdded: fullTokenInfo.tokenInfo.dateAdded ?? "",
+        dateLaunched: fullTokenInfo.tokenInfo.dateLaunched ?? "",
+        category: fullTokenInfo.tokenInfo.category ?? "",
+        description: fullTokenInfo.tokenInfo.description ?? "",
+        krakenAssetName: fullTokenInfo.tokenInfo.symbol ?? "",
+        stakedCoins: fullTokenInfo.tokenInfo.stakedCoins ?? "",
+      });
+      setSearchValue(fullTokenInfo.tokenInfo.slug);
+      setMinOrderValue(fullTokenInfo.tokenInfo.minOrderValue);
+      setRank(fullTokenInfo.tokenInfo.rank ?? "");
+      setPairName(fullTokenInfo.tokenPair.pairName);
+      setSearchPairName(fullTokenInfo.tokenPair.pairName);
+      setDefaultTokenPosition(
+        fullTokenInfo.tokenPair.firstToken.id === fullTokenInfo.defaultTokenId
+          ? TokenPairPositionEnum.FIRST
+          : TokenPairPositionEnum.SECOND,
+      );
+      setCompanyWallets(
+        fullTokenInfo.tokenInfo.companyWallets.map((wallet) => {
+          return {
+            ...wallet,
+            networkId: wallet.network.id,
+          };
+        }),
+      );
+
+      return;
+    }
+
     if (data) {
       setTokenInfo((prevState) => ({
         ...prevState,
@@ -112,7 +165,7 @@ export default function CreateTokenForm() {
         krakenAssetName: data.symbol ?? "",
       }));
     }
-  }, [data]);
+  }, [data, fullTokenInfo, isEdit]);
 
   useEffect(() => {
     if (pairData) {
@@ -142,16 +195,18 @@ export default function CreateTokenForm() {
 
     const data = new FormData(event.currentTarget);
 
-    const companyWallets = [...Array(walletsCount).keys()].map((value) => {
-      return {
-        name: data.get(`walletName${value}`)! as string,
-        networkId: Number(data.get(`network${value}`)!),
-        walletAddress: data.get(`walletAddress${value}`)! as string,
-        memo: data.get(`memo${value}`)
-          ? (data.get(`memo${value}`) as string)
-          : null,
-      };
-    });
+    const companyWalletsForCreate = [...Array(walletsCount).keys()].map(
+      (value) => {
+        return {
+          name: data.get(`walletName${value}`)! as string,
+          networkId: Number(data.get(`network${value}`)!),
+          walletAddress: data.get(`walletAddress${value}`)! as string,
+          memo: data.get(`memo${value}`)
+            ? (data.get(`memo${value}`) as string)
+            : null,
+        };
+      },
+    );
 
     const payload = {
       tokenInfo: {
@@ -170,11 +225,10 @@ export default function CreateTokenForm() {
         rank: rank ? Number(rank) : null,
       },
       tokenPair: {
-        defaultTokenId: defaultTokenData ? defaultTokenData.defaultToken.id : 0,
         pairName: isPairMatch ? searchPairName : "",
         defaultTokenPosition: defaultTokenPosition as TokenPairPositionEnum,
       },
-      companyWallets,
+      companyWallets: companyWalletsForCreate,
     };
 
     createToken(payload)
@@ -190,6 +244,51 @@ export default function CreateTokenForm() {
         setPairName("");
         setDefaultTokenPosition(null);
         setShowPairMsg(false);
+      })
+      .catch((e) => {
+        toast.error(JSON.stringify(e?.data?.message));
+      });
+  };
+
+  const handleSubmitForEdit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const companyWalletsForEdit = companyWallets.map((wallet) => {
+      return {
+        ...wallet,
+        networkId: Number(wallet.networkId),
+        memo: wallet.memo ?? null,
+      };
+    });
+
+    const payload = {
+      id: tokenInfo.id!,
+      tokenInfo: {
+        coinMarketId: Number(tokenInfo.coinMarketId),
+        name: tokenInfo.name,
+        symbol: tokenInfo.symbol,
+        logo: tokenInfo.logo,
+        krakenAssetName: tokenInfo.krakenAssetName,
+        minOrderValue: Number(minOrderValue),
+        slug: searchValue,
+        stakedCoins: tokenInfo.stakedCoins ? tokenInfo.stakedCoins : null,
+        dateAdded: tokenInfo.dateAdded ? tokenInfo.dateAdded : null,
+        dateLaunched: tokenInfo.dateLaunched ? tokenInfo.dateLaunched : null,
+        category: tokenInfo.category ? tokenInfo.category : null,
+        description: tokenInfo.description ? tokenInfo.description : null,
+        rank: rank ? Number(rank) : null,
+      },
+      tokenPair: {
+        pairName: isPairMatch ? searchPairName : "",
+        defaultTokenPosition: defaultTokenPosition as TokenPairPositionEnum,
+      },
+      companyWallets: companyWalletsForEdit,
+    };
+
+    updateToken(payload)
+      .unwrap()
+      .then(() => {
+        toast.success("Token successfully updated");
       })
       .catch((e) => {
         toast.error(JSON.stringify(e?.data?.message));
@@ -233,40 +332,54 @@ export default function CreateTokenForm() {
         }}
       >
         <Typography component="h1" variant="h5">
-          Create new token form
+          {isEdit ? "Edit token" : "Create new token form"}
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+        <Box
+          component="form"
+          onSubmit={isEdit ? handleSubmitForEdit : handleSubmit}
+          sx={{ mt: 3 }}
+        >
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={11}>
-              <TextField
-                error={isError}
-                helperText={isError ? "Token not found" : null}
-                required
-                fullWidth
-                id="search-by-slug"
-                label="Search by slug"
-                name="search-by-slug"
-                type="search"
-                value={searchSlug}
-                onChange={(e) => setSearchSlug(e.target.value.toLowerCase())}
-                autoFocus
-              />
-            </Grid>
+            {!isEdit && (
+              <>
+                <Grid item xs={12} sm={11}>
+                  <TextField
+                    error={isError}
+                    helperText={isError ? "Token not found" : null}
+                    required
+                    fullWidth
+                    id="search-by-slug"
+                    label="Search by slug"
+                    name="search-by-slug"
+                    type="search"
+                    value={searchSlug}
+                    onChange={(e) =>
+                      setSearchSlug(e.target.value.toLowerCase())
+                    }
+                    autoFocus
+                  />
+                </Grid>
 
-            <Grid item xs={12} sm={1}>
-              <Button
-                fullWidth
-                variant="contained"
-                onClick={handleSearchTokenBySlug}
-                sx={{ height: "56px" }}
-              >
-                {isFetching ? <CircularProgress color="inherit" /> : "Search"}
-              </Button>
-            </Grid>
+                <Grid item xs={12} sm={1}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={handleSearchTokenBySlug}
+                    sx={{ height: "56px" }}
+                  >
+                    {isFetching ? (
+                      <CircularProgress color="inherit" />
+                    ) : (
+                      "Search"
+                    )}
+                  </Button>
+                </Grid>
 
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
+              </>
+            )}
 
             <Grid item xs={12} sm={3}>
               <TextField
@@ -277,7 +390,7 @@ export default function CreateTokenForm() {
                 name="name"
                 value={tokenInfo.name}
                 onChange={onTokenInfoChange}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -290,7 +403,7 @@ export default function CreateTokenForm() {
                 name="symbol"
                 value={tokenInfo.symbol}
                 onChange={onTokenInfoChange}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -326,7 +439,7 @@ export default function CreateTokenForm() {
                 name="logo"
                 value={tokenInfo.logo}
                 onChange={onTokenInfoChange}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -340,7 +453,7 @@ export default function CreateTokenForm() {
                 type="number"
                 value={minOrderValue}
                 onChange={(e) => setMinOrderValue(Number(e.target.value))}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -353,7 +466,7 @@ export default function CreateTokenForm() {
                 name="krakenAssetName"
                 value={tokenInfo.krakenAssetName}
                 onChange={onTokenInfoChange}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -365,7 +478,7 @@ export default function CreateTokenForm() {
                 name="category"
                 value={tokenInfo.category}
                 onChange={onTokenInfoChange}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -377,7 +490,7 @@ export default function CreateTokenForm() {
                 name="dateAdded"
                 value={tokenInfo.dateAdded}
                 onChange={onTokenInfoChange}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -389,7 +502,7 @@ export default function CreateTokenForm() {
                 name="dateLaunched"
                 value={tokenInfo.dateLaunched}
                 onChange={onTokenInfoChange}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -402,7 +515,7 @@ export default function CreateTokenForm() {
                 type="number"
                 value={rank}
                 onChange={(e) => setRank(e.target.value)}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -415,7 +528,7 @@ export default function CreateTokenForm() {
                 type="number"
                 value={tokenInfo.stakedCoins}
                 onChange={onTokenInfoChange}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -427,7 +540,7 @@ export default function CreateTokenForm() {
                 name="description"
                 value={tokenInfo.description}
                 onChange={onTokenInfoChange}
-                disabled={!isSuccess}
+                disabled={!isSuccess && !isEdit}
               />
             </Grid>
 
@@ -505,112 +618,38 @@ export default function CreateTokenForm() {
                   label="Second"
                 />
               </RadioGroup>
+
+              {defaultTokenData && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Typography variant="body1">
+                    {`${defaultTokenData.defaultToken.name} (${defaultTokenData.defaultToken.symbol})`}
+                  </Typography>
+                  <Image
+                    src={defaultTokenData.defaultToken.logo}
+                    width={32}
+                    height={32}
+                    alt="token logo"
+                  />
+                </Box>
+              )}
             </FormControl>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} sx={{ mb: 2 }}>
             <Divider />
           </Grid>
 
-          <Grid item xs={12} sx={{ mt: 2 }}>
-            <Typography>Company wallets:</Typography>
-          </Grid>
-
-          {[...Array(walletsCount).keys()].map((value, i, array) => (
-            <Grid key={value} container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  sx={{ mt: 2 }}
-                  fullWidth
-                  id={`walletAddress${value}`}
-                  label="Wallet Address"
-                  name={`walletAddress${value}`}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth required>
-                  <InputLabel id="network-select-label">Network</InputLabel>
-                  <Select
-                    defaultValue={""}
-                    labelId="network"
-                    id={`network${value}`}
-                    name={`network${value}`}
-                    label="Network"
-                  >
-                    {networksData &&
-                      networksData.networks.map((network) => (
-                        <MenuItem
-                          key={network.id}
-                          value={network.id}
-                          sx={{ display: "flex", gap: 1 }}
-                        >
-                          <Image
-                            title={network.name}
-                            src={network.logo}
-                            width={16}
-                            height={16}
-                            alt="token logo"
-                          />{" "}
-                          {network.name}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  required
-                  fullWidth
-                  id={`walletName${value}`}
-                  label="Wallet Name"
-                  name={`walletName${value}`}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  fullWidth
-                  id={`memo${value}`}
-                  label="Memo"
-                  name={`memo${value}`}
-                />
-              </Grid>
-
-              {array.length - 1 !== i && (
-                <Grid item xs={12} sx={{ mb: 2 }}>
-                  <Divider />
-                </Grid>
-              )}
-            </Grid>
-          ))}
-
-          <Grid item xs={12} sx={{ mt: 2 }}>
-            <Button
-              sx={{ mr: 2 }}
-              color="secondary"
-              variant={"contained"}
-              onClick={() => setWalletsCount((prevState) => prevState + 1)}
-            >
-              Add more wallets
-            </Button>
-
-            {walletsCount > 1 && (
-              <Button
-                color="error"
-                variant={"contained"}
-                onClick={() =>
-                  setWalletsCount((prevState) =>
-                    prevState !== 1 ? prevState - 1 : 1,
-                  )
-                }
-              >
-                Remove last wallet
-              </Button>
-            )}
-          </Grid>
+          {isEdit ? (
+            <EditCompanyWallets
+              companyWallets={companyWallets}
+              setCompanyWallets={setCompanyWallets}
+            />
+          ) : (
+            <CreateCompanyWallets
+              walletsCount={walletsCount}
+              setWalletsCount={setWalletsCount}
+            />
+          )}
 
           <Grid item xs={12} sx={{ mt: 2 }}>
             <Divider />

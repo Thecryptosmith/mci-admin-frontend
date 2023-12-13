@@ -17,12 +17,12 @@ export type TokenInfoType = {
 };
 
 export type TokenPairType = {
-  defaultTokenId: number;
   pairName: string;
   defaultTokenPosition: TokenPairPositionEnum;
 };
 
 export type TokenCompanyWalletType = {
+  id?: number;
   networkId: number;
   walletAddress: string;
   name: string;
@@ -30,6 +30,7 @@ export type TokenCompanyWalletType = {
 };
 
 export type CreateTokenReqPayload = {
+  id?: number;
   tokenInfo: TokenInfoType;
   tokenPair: TokenPairType;
   companyWallets: TokenCompanyWalletType[];

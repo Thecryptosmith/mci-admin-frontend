@@ -9,6 +9,8 @@ import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
 import { CreateNetworkReqPayload } from "@src/types/createNetworkReqPayload";
 import { CreateTokenReqPayload } from "@src/types/createTokenReqPayload";
+import { GetDefaultTokenRes } from "@src/types/getDefaultTokenRes";
+import { GetFullTokenInfoRes } from "@src/types/getFullTokenInfoRes";
 import { GetNetworksListRes } from "@src/types/getNetworksListRes";
 import { GetOrderLogsRes } from "@src/types/getOrderLogsRes";
 import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
@@ -308,7 +310,7 @@ export const adminApi = createApi({
       }),
     }),
 
-    getDefaultToken: builder.query<{ defaultToken: { id: number } }, void>({
+    getDefaultToken: builder.query<GetDefaultTokenRes, void>({
       query: () => ({
         url: "/token-info/get-default-token",
         method: "GET",
@@ -390,6 +392,22 @@ export const adminApi = createApi({
       }),
       invalidatesTags: [{ type: "Admin", id: "TRENDING" }],
     }),
+
+    getFullTokenInfo: builder.query<GetFullTokenInfoRes, number>({
+      query: (id) => ({
+        url: `/token-info/${id}`,
+        method: "GET",
+      }),
+    }),
+
+    updateToken: builder.mutation<void, CreateTokenReqPayload>({
+      query: (body) => ({
+        url: "/token-info",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "TOKENS" }],
+    }),
   }),
 });
 
@@ -424,4 +442,6 @@ export const {
   useDeleteNetworkMutation,
   useGetTrendingTokensQuery,
   useUpdateTrendingTokensMutation,
+  useGetFullTokenInfoQuery,
+  useUpdateTokenMutation,
 } = adminApi;
