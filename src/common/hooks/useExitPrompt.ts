@@ -32,8 +32,6 @@ const initBeforeUnLoad = (
 
   window.onbeforeunload = () => {
     if (showExitPrompt && isReviewingPrevPath) {
-      console.log("action before unmount");
-
       let orderId = 0;
 
       if (isReviewingPrevPath) {
@@ -42,7 +40,6 @@ const initBeforeUnLoad = (
         orderId = Number(pathParts[pathParts.length - 1]);
       }
 
-      console.log("before callback");
       if (callback) {
         return callback({
           id: orderId,

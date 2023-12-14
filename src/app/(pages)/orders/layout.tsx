@@ -40,8 +40,6 @@ export default function OrdersLayout({ children }: OrdersLayoutProps) {
     const onNotification = (
       data: NotificationData | ChangedStatusOrdersNotification,
     ) => {
-      console.log("onNotification log");
-
       if (data.type !== NotificationTypeEnum.ORDER_STATUS_UPDATED) {
         dispatch(setNotificationData(data as NotificationData));
         localStorage.setItem("notificationData", JSON.stringify(data));

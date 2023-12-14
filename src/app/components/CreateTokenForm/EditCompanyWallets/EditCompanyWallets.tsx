@@ -26,17 +26,12 @@ export default function EditCompanyWallets({
 }: EditCompanyWalletsProps) {
   const { data: networksData } = useGetAllNetworksQuery();
 
-  console.log(companyWallets);
-
   const handleChangeInput = (
     e:
       | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
       | SelectChangeEvent<string | number>,
     index: number,
   ) => {
-    console.log(e.target.name);
-    console.log(e.target.value);
-
     setCompanyWallets((prevState) => {
       const newArr = [...prevState];
 
@@ -83,6 +78,7 @@ export default function EditCompanyWallets({
                 }}
                 value={wallet.networkId ?? ""}
                 onChange={(e) => handleChangeInput(e, i)}
+                disabled={typeof wallet.id === "number"}
               >
                 {networksData &&
                   networksData.networks.map((network) => (
@@ -145,7 +141,7 @@ export default function EditCompanyWallets({
             setCompanyWallets((prevState) => [
               ...prevState,
               {
-                id: Date.now(),
+                id: Date.now().toString(),
                 walletAddress: "",
                 name: "",
                 memo: "",
@@ -157,7 +153,7 @@ export default function EditCompanyWallets({
           Add more wallets
         </Button>
 
-        {companyWallets.length > 1 && (
+        {companyWallets.length > 0 && (
           <Button
             color="error"
             variant={"contained"}
