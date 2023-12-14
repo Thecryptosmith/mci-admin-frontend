@@ -14,7 +14,7 @@ export type CompanyWalletResType = {
 };
 
 export type CompanyWalletForEditType = {
-  id: number;
+  id: number | string;
   name: string;
   memo: string;
   walletAddress: string;
