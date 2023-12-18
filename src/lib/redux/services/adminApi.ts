@@ -34,6 +34,8 @@ import { SendReviewingNotificationReqPayload } from "@src/types/sendReviewingNot
 import { UpdateTrendingTokensReqPayload } from "@src/types/updateTrendingTokensReqPayload";
 import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificationReqPayload";
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
+import { GetAllWalletProvidersQueryParams } from "@src/types/wallet-providers/getAllWalletProvidersQueryParams";
+import { GetAllWalletProvidersRes } from "@src/types/wallet-providers/getAllWalletProvidersRes";
 
 export const adminApi = createApi({
   reducerPath: "adminApi",
@@ -408,6 +410,26 @@ export const adminApi = createApi({
       }),
       invalidatesTags: [{ type: "Admin", id: "TOKENS" }],
     }),
+
+    getAllWalletProviders: builder.query<
+      GetAllWalletProvidersRes,
+      GetAllWalletProvidersQueryParams
+    >({
+      query: ({ limit, offset, search }) => {
+        const queryParams = new URLSearchParams();
+
+        search && queryParams.set("search", search);
+        limit && queryParams.set("limit", `${limit}`);
+        (offset || offset === 0) && queryParams.set("offset", `${offset}`);
+
+        return {
+          url: "/wallet-provider",
+          method: "GET",
+          params: queryParams,
+        };
+      },
+      providesTags: [{ type: "Admin", id: "WALLET-PROVIDERS" }],
+    }),
   }),
 });
 
@@ -444,4 +466,5 @@ export const {
   useUpdateTrendingTokensMutation,
   useGetFullTokenInfoQuery,
   useUpdateTokenMutation,
+  useGetAllWalletProvidersQuery,
 } = adminApi;

@@ -21,6 +21,10 @@ const nextConfig = {
         port: '',
         pathname: '/static/img/**',
       },
+      {
+        protocol: 'https',
+        hostname: '**.amazonaws.com',
+      },
     ],
   },
 };

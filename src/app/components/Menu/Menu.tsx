@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import Ballot from "@mui/icons-material/Ballot";
+import FeaturedPlayListIcon from "@mui/icons-material/FeaturedPlayList";
 import Group from "@mui/icons-material/Group";
 import Groups3Icon from "@mui/icons-material/Groups3";
 import HomeIcon from "@mui/icons-material/Home";
@@ -36,6 +37,11 @@ const LINKS = [
   { text: "Orders", href: "/orders", icon: ListIcon },
   { text: "Wallets", href: "/wallets", icon: Wallet },
   { text: "Tokens", href: "/tokens", icon: Ballot },
+  {
+    text: "Wallet Providers",
+    href: "/wallet-providers",
+    icon: FeaturedPlayListIcon,
+  },
 ];
 
 export default function Menu() {
