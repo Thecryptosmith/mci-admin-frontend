@@ -22,7 +22,7 @@ export type TokenPairType = {
 };
 
 export type TokenCompanyWalletType = {
-  id?: number;
+  id?: number | string;
   networkId: number;
   walletAddress: string;
   name: string;
