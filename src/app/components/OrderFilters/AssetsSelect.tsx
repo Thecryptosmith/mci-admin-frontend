@@ -11,7 +11,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 import TextField from "@mui/material/TextField";
 import { CurrencyCode } from "@src/common/emuns/CurrencyCodeEnum";
 import { useDebounce } from "@src/common/hooks/useDebounce";
-import { useGetTokensQuery } from "@src/lib/redux/services/adminApi";
+import {
+  useGetNetworkTokensQuery,
+  useGetTokensQuery,
+} from "@src/lib/redux/services/adminApi";
 import { GetTokensQueryParams } from "@src/types/getTokensQueryParams";
 import { TokenData } from "@src/types/getTokensRes";
 
@@ -32,26 +35,48 @@ type AssetsSelectProps = {
   label: string;
   selectedValues: TokenData[];
   setSelectedValues: Dispatch<SetStateAction<TokenData[]>>;
+  isNetworkTokens?: boolean;
+  networkId?: number;
 };
 
 export default function AssetsSelect({
   label,
   selectedValues,
   setSelectedValues,
+  isNetworkTokens = false,
+  networkId = 0,
 }: AssetsSelectProps) {
   const [params, setParams] = useState<GetTokensQueryParams | null>({
     limit: 10,
   });
   const [open, setOpen] = useState(false);
-  const [assets, setAssets] = useState<TokenData[]>(currencies);
+  const [assets, setAssets] = useState<TokenData[]>(
+    isNetworkTokens ? [] : currencies,
+  );
   const [inputValue, setInputValue] = useState("");
   const debouncedInputValue = useDebounce<string>(inputValue, 500);
 
   const { data, isLoading, isFetching } = useGetTokensQuery(params!, {
-    skip: !open,
+    skip: !open || isNetworkTokens,
   });
 
-  const loading = open && (isLoading || isFetching);
+  const {
+    data: networkTokensData,
+    isLoading: isNetworkTokensLoading,
+    isFetching: isNetworkTokensFetching,
+  } = useGetNetworkTokensQuery(
+    { ...params!, id: networkId },
+    {
+      skip: !open || !isNetworkTokens,
+    },
+  );
+
+  const loading =
+    open &&
+    (isLoading ||
+      isFetching ||
+      isNetworkTokensLoading ||
+      isNetworkTokensFetching);
 
   useEffect(() => {
     if (debouncedInputValue) {
@@ -73,7 +98,19 @@ export default function AssetsSelect({
     if (data) {
       setAssets([...currencies, ...data.tokens]);
     }
-  }, [data]);
+  }, [inputValue, data]);
+
+  useEffect(() => {
+    if (inputValue && networkTokensData) {
+      setAssets(networkTokensData.tokensInfo);
+
+      return;
+    }
+
+    if (networkTokensData) {
+      setAssets(networkTokensData.tokensInfo);
+    }
+  }, [inputValue, networkTokensData]);
 
   useEffect(() => {
     let active = true;
@@ -86,10 +123,14 @@ export default function AssetsSelect({
       setAssets([...currencies, ...data.tokens]);
     }
 
+    if (active && networkTokensData) {
+      setAssets(networkTokensData.tokensInfo);
+    }
+
     return () => {
       active = false;
     };
-  }, [data, loading]);
+  }, [networkTokensData, data, loading]);
 
   const handleChipDelete = (chipToDelete: TokenData) => () => {
     setSelectedValues((prevState) =>
@@ -108,7 +149,7 @@ export default function AssetsSelect({
       multiple
       disableCloseOnSelect
       id="assets-select"
-      sx={{ width: 300 }}
+      sx={{ width: isNetworkTokens ? "100%" : 300 }}
       open={open}
       onOpen={() => {
         setOpen(true);

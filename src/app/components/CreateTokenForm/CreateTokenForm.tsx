@@ -118,7 +118,7 @@ export default function CreateTokenForm({
     if (isEdit && fullTokenInfo) {
       setTokenInfo({
         id: fullTokenInfo.tokenInfo.id,
-        coinMarketId: fullTokenInfo.tokenInfo.id,
+        coinMarketId: fullTokenInfo.tokenInfo.coinMarketId,
         name: fullTokenInfo.tokenInfo.name ?? "",
         symbol: fullTokenInfo.tokenInfo.symbol ?? "",
         logo: fullTokenInfo.tokenInfo.logo ?? "",
