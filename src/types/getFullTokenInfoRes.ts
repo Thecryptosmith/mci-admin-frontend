@@ -19,6 +19,10 @@ export type CompanyWalletForEditType = {
   memo: string;
   walletAddress: string;
   networkId: string | number;
+  tokenExplorer: {
+    walletExplorerLink: string | null;
+    transactionExplorerLink: string | null;
+  }
 };
 
 type TokenType = {

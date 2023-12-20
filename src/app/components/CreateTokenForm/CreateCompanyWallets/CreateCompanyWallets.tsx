@@ -41,6 +41,20 @@ export default function CreateCompanyWallets({
               label="Wallet Address"
               name={`walletAddress${value}`}
             />
+            <TextField
+              sx={{ mt: 2 }}
+              fullWidth
+              id={`walletExplorerLink${value}`}
+              label="Wallet Explorer Link"
+              name={`walletExplorerLink${value}`}
+            />
+            <TextField
+              sx={{ mt: 2 }}
+              fullWidth
+              id={`transactionExplorerLink${value}`}
+              label="Transaction Explorer Link"
+              name={`transactionExplorerLink${value}`}
+            />
           </Grid>
 
           <Grid item xs={12} sm={4}>
