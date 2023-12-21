@@ -27,7 +27,7 @@ export default function EditCompanyWallets({
   const { data: networksData } = useGetAllNetworksQuery();
 
   const handleChangeInput = (
-    e:
+    {target: {name, value}}:
       | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
       | SelectChangeEvent<string | number>,
     index: number,
@@ -35,7 +35,13 @@ export default function EditCompanyWallets({
     setCompanyWallets((prevState) => {
       const newArr = [...prevState];
 
-      newArr[index] = { ...newArr[index], [e.target.name]: e.target.value };
+      if(name === 'walletExplorerLink' || name === 'transactionExplorerLink') {
+        newArr[index] = { ...newArr[index], tokenExplorer: {...newArr[index].tokenExplorer, [name]: value as string}};
+
+        return newArr
+      }
+
+      newArr[index] = { ...newArr[index], [name]: value };
 
       return newArr;
     });
@@ -58,6 +64,24 @@ export default function EditCompanyWallets({
               label="Wallet Address"
               name="walletAddress"
               value={wallet.walletAddress}
+              onChange={(e) => handleChangeInput(e, i)}
+            />
+            <TextField
+              sx={{ mt: 2 }}
+              fullWidth
+              id={`walletExplorerLink${i}`}
+              label="Wallet Explorer Link"
+              name="walletExplorerLink"
+              value={wallet.tokenExplorer?.walletExplorerLink ?? ""}
+              onChange={(e) => handleChangeInput(e, i)}
+            />
+            <TextField
+              sx={{ mt: 2 }}
+              fullWidth
+              id={`transactionExplorerLink${i}`}
+              label="Transaction Explorer Link"
+              name="transactionExplorerLink"
+              value={wallet.tokenExplorer?.transactionExplorerLink ?? ""}
               onChange={(e) => handleChangeInput(e, i)}
             />
           </Grid>
