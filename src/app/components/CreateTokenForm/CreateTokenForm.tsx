@@ -204,8 +204,10 @@ export default function CreateTokenForm({
           memo: data.get(`memo${value}`)
             ? (data.get(`memo${value}`) as string)
             : null,
-          walletExplorerLink: data.get(`walletExplorerLink${value}`) as string ?? null,
-          transactionExplorerLink: data.get(`transactionExplorerLink${value}`) as string ?? null
+          walletExplorerLink:
+            (data.get(`walletExplorerLink${value}`) as string) ?? null,
+          transactionExplorerLink:
+            (data.get(`transactionExplorerLink${value}`) as string) ?? null,
         };
       },
     );
@@ -256,7 +258,7 @@ export default function CreateTokenForm({
     event.preventDefault();
 
     const companyWalletsForEdit = companyWallets.map((wallet) => {
-      console.log({wallet})
+      console.log({ wallet });
       return {
         ...wallet,
         networkId: Number(wallet.networkId),
