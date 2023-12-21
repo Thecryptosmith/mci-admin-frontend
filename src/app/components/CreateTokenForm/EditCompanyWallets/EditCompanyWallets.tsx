@@ -27,7 +27,9 @@ export default function EditCompanyWallets({
   const { data: networksData } = useGetAllNetworksQuery();
 
   const handleChangeInput = (
-    {target: {name, value}}:
+    {
+      target: { name, value },
+    }:
       | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
       | SelectChangeEvent<string | number>,
     index: number,
@@ -35,10 +37,16 @@ export default function EditCompanyWallets({
     setCompanyWallets((prevState) => {
       const newArr = [...prevState];
 
-      if(name === 'walletExplorerLink' || name === 'transactionExplorerLink') {
-        newArr[index] = { ...newArr[index], tokenExplorer: {...newArr[index].tokenExplorer, [name]: value as string}};
+      if (name === "walletExplorerLink" || name === "transactionExplorerLink") {
+        newArr[index] = {
+          ...newArr[index],
+          tokenExplorer: {
+            ...newArr[index].tokenExplorer,
+            [name]: value as string,
+          },
+        };
 
-        return newArr
+        return newArr;
       }
 
       newArr[index] = { ...newArr[index], [name]: value };
@@ -170,6 +178,10 @@ export default function EditCompanyWallets({
                 name: "",
                 memo: "",
                 networkId: "",
+                tokenExplorer: {
+                  transactionExplorerLink: null,
+                  walletExplorerLink: null,
+                },
               },
             ])
           }

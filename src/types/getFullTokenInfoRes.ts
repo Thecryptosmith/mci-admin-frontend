@@ -11,6 +11,10 @@ export type CompanyWalletResType = {
   memo: string;
   walletAddress: string;
   network: NetworkType;
+  tokenExplorer: {
+    walletExplorerLink: string | null;
+    transactionExplorerLink: string | null;
+  };
 };
 
 export type CompanyWalletForEditType = {
@@ -22,7 +26,7 @@ export type CompanyWalletForEditType = {
   tokenExplorer: {
     walletExplorerLink: string | null;
     transactionExplorerLink: string | null;
-  }
+  };
 };
 
 type TokenType = {
