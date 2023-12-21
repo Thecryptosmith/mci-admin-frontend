@@ -1,4 +1,9 @@
-export type NetworkTokensInfo = { id: number; yield: number | null };
+export type NetworkTokensInfo = {
+  id: number;
+  yield: number | string | null;
+  name?: string;
+  slug?: string;
+};
 
 export type NetworkWithTokens = {
   id: string;
@@ -12,4 +17,5 @@ export type NetworkWithTokens = {
 export type NetworkWithTokensPayload = {
   id: number;
   tokensInfo: NetworkTokensInfo[];
+  yield?: string | number | null;
 };

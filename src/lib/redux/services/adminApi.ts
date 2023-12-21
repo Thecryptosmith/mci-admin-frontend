@@ -38,6 +38,9 @@ import { GetAllWalletProvidersQueryParams } from "@src/types/wallet-providers/ge
 import { GetAllWalletProvidersRes } from "@src/types/wallet-providers/getAllWalletProvidersRes";
 import { GetNetworkTokensParams } from "@src/types/wallet-providers/getNetworkTokensParams";
 import { GetNetworkTokensRes } from "@src/types/wallet-providers/getNetworkTokensRes";
+import { GetWalletProviderRes } from "@src/types/wallet-providers/getWalletProviderRes";
+import { UpdateWalletProviderReqPayload } from "@src/types/wallet-providers/updateWalletProviderReqPayload";
+import { UpdateWalletProviderRes } from "@src/types/wallet-providers/updateWalletProviderRes";
 
 export const adminApi = createApi({
   reducerPath: "adminApi",
@@ -460,6 +463,43 @@ export const adminApi = createApi({
       }),
       invalidatesTags: [{ type: "Admin", id: "WALLET-PROVIDERS" }],
     }),
+
+    getWalletProvider: builder.query<GetWalletProviderRes, number>({
+      query: (id) => ({
+        url: `/wallet-provider/${id}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "WALLET-PROVIDER" }],
+    }),
+
+    updateWalletProvider: builder.mutation<
+      void,
+      UpdateWalletProviderReqPayload
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/wallet-provider/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (result, error) =>
+        !error
+          ? [
+              { type: "Admin", id: "WALLET-PROVIDER" },
+              { type: "Admin", id: "WALLET-PROVIDERS" },
+            ]
+          : [],
+    }),
+
+    createWalletProviderLogo: builder.mutation<
+      UpdateWalletProviderRes,
+      FormData
+    >({
+      query: (body) => ({
+        url: "/wallet-provider/logo",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -499,4 +539,7 @@ export const {
   useGetAllWalletProvidersQuery,
   useGetNetworkTokensQuery,
   useCreateWalletProviderMutation,
+  useGetWalletProviderQuery,
+  useUpdateWalletProviderMutation,
+  useCreateWalletProviderLogoMutation,
 } = adminApi;

@@ -1,5 +1,5 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import * as React from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Image from "next/image";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -20,21 +20,31 @@ type SelectNetworksWithTokensProps = {
   network: NetworkWithTokens;
   index: number;
   setNetworksWithTokens: Dispatch<SetStateAction<NetworkWithTokens[]>>;
+  isEdit?: boolean;
 };
 
 export default function SelectNetworksWithTokens({
   network,
   index,
   setNetworksWithTokens,
+  isEdit = false,
 }: SelectNetworksWithTokensProps) {
-  const [selectedNetwork, setSelectedNetwork] = useState<number | string>("");
-  const [selectedAssets, setSelectedAssets] = useState<TokenData[]>([]);
-  const [yieldValue, setYieldValue] = useState<number | string>("");
-
   const { data: networksData } = useGetAllNetworksQuery();
 
+  const [selectedNetwork, setSelectedNetwork] = useState<number | string>(() =>
+    isEdit && networksData && network.data.id > 0 ? network.data.id : "",
+  );
+  const [selectedAssets, setSelectedAssets] = useState<TokenData[]>(() =>
+    isEdit && network.data.tokensInfo
+      ? (network.data.tokensInfo as TokenData[])
+      : [],
+  );
+  const [yieldValue, setYieldValue] = useState<number | string>(() =>
+    isEdit && network.data.yield ? network.data.yield : "",
+  );
+
   useEffect(() => {
-    if (selectedAssets.length > 0) {
+    if (selectedAssets.length > 0 && !isEdit) {
       setNetworksWithTokens((prevState) => {
         const newArr = [...prevState];
 
@@ -50,7 +60,34 @@ export default function SelectNetworksWithTokens({
         return newArr;
       });
     }
-  }, [network.id, selectedAssets, setNetworksWithTokens, yieldValue]);
+  }, [isEdit, network.id, selectedAssets, setNetworksWithTokens, yieldValue]);
+
+  useEffect(() => {
+    if (isEdit) {
+      setNetworksWithTokens((prevState) => {
+        const newArr = [...prevState];
+
+        const itemIndex = newArr.findIndex((item) => item.id === network.id);
+
+        newArr.splice(itemIndex, 1, {
+          id: newArr[itemIndex].id,
+          data: {
+            id: newArr[itemIndex].data.id,
+            tokensInfo:
+              selectedAssets.length > 0
+                ? selectedAssets.map((asset) => ({
+                    id: asset.id,
+                    yield: yieldValue ? yieldValue : null,
+                  }))
+                : null,
+            yield: yieldValue ? yieldValue : null,
+          },
+        });
+
+        return newArr;
+      });
+    }
+  }, [selectedAssets, isEdit, yieldValue]);
 
   const onNetworkSelect = (e: SelectChangeEvent<string | number>) => {
     setSelectedNetwork(e.target.value);
@@ -126,7 +163,7 @@ export default function SelectNetworksWithTokens({
       </Grid>
 
       <Grid item xs={12} sm={8}>
-        {selectedNetwork && (
+        {!!selectedNetwork && (
           <AssetsSelect
             label={"Select Assets"}
             selectedValues={selectedAssets}
