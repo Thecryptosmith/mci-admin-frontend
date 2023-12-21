@@ -14,7 +14,7 @@ export const Providers = (props: React.PropsWithChildren) => {
   return (
     <Provider store={reduxStore}>
       <VerificationProvider>{props.children}</VerificationProvider>
-      <ToastContainer autoClose={6000} position="top-center" />
+      <ToastContainer autoClose={5000} position="top-center" />
     </Provider>
   );
 };

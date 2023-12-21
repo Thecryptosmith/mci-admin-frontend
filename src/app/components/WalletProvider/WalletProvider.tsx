@@ -1,5 +1,7 @@
 "use client";
 
+import CreateWalletProviderForm from "@src/app/components/CreateWalletProviderForm/CreateWalletProviderForm";
+
 type WalletProviderProps = {
   id: number;
 };
@@ -7,7 +9,7 @@ type WalletProviderProps = {
 export default function WalletProvider({ id }: WalletProviderProps) {
   return (
     <>
-      <div>WalletProviderID: {id}</div>
+      <CreateWalletProviderForm id={id} isEdit />
     </>
   );
 }

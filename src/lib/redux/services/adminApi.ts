@@ -36,6 +36,11 @@ import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificat
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
 import { GetAllWalletProvidersQueryParams } from "@src/types/wallet-providers/getAllWalletProvidersQueryParams";
 import { GetAllWalletProvidersRes } from "@src/types/wallet-providers/getAllWalletProvidersRes";
+import { GetNetworkTokensParams } from "@src/types/wallet-providers/getNetworkTokensParams";
+import { GetNetworkTokensRes } from "@src/types/wallet-providers/getNetworkTokensRes";
+import { GetWalletProviderRes } from "@src/types/wallet-providers/getWalletProviderRes";
+import { UpdateWalletProviderReqPayload } from "@src/types/wallet-providers/updateWalletProviderReqPayload";
+import { UpdateWalletProviderRes } from "@src/types/wallet-providers/updateWalletProviderRes";
 
 export const adminApi = createApi({
   reducerPath: "adminApi",
@@ -430,6 +435,71 @@ export const adminApi = createApi({
       },
       providesTags: [{ type: "Admin", id: "WALLET-PROVIDERS" }],
     }),
+
+    getNetworkTokens: builder.query<
+      GetNetworkTokensRes,
+      GetNetworkTokensParams
+    >({
+      query: ({ id, limit, offset, search }) => {
+        const queryParams = new URLSearchParams();
+
+        search && queryParams.set("search", search);
+        limit && queryParams.set("limit", `${limit}`);
+        (offset || offset === 0) && queryParams.set("offset", `${offset}`);
+
+        return {
+          url: `/network/${id}/tokens`,
+          method: "GET",
+          params: queryParams,
+        };
+      },
+    }),
+
+    createWalletProvider: builder.mutation<void, FormData>({
+      query: (body) => ({
+        url: "/wallet-provider",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "WALLET-PROVIDERS" }],
+    }),
+
+    getWalletProvider: builder.query<GetWalletProviderRes, number>({
+      query: (id) => ({
+        url: `/wallet-provider/${id}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "WALLET-PROVIDER" }],
+    }),
+
+    updateWalletProvider: builder.mutation<
+      void,
+      UpdateWalletProviderReqPayload
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/wallet-provider/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (result, error) =>
+        !error
+          ? [
+              { type: "Admin", id: "WALLET-PROVIDER" },
+              { type: "Admin", id: "WALLET-PROVIDERS" },
+            ]
+          : [],
+    }),
+
+    createWalletProviderLogo: builder.mutation<
+      UpdateWalletProviderRes,
+      FormData
+    >({
+      query: (body) => ({
+        url: "/wallet-provider/logo",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -467,4 +537,9 @@ export const {
   useGetFullTokenInfoQuery,
   useUpdateTokenMutation,
   useGetAllWalletProvidersQuery,
+  useGetNetworkTokensQuery,
+  useCreateWalletProviderMutation,
+  useGetWalletProviderQuery,
+  useUpdateWalletProviderMutation,
+  useCreateWalletProviderLogoMutation,
 } = adminApi;

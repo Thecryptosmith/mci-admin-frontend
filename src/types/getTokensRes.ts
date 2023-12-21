@@ -1,14 +1,15 @@
 export type TokenData = {
   id: number;
+  name: string;
   slug: string;
   logo?: string;
-  name: string;
   symbol?: string;
   price?: number;
   percentChange24h?: number;
   volume24h?: number;
   marketCap?: number;
   rank?: number;
+  yield?: string | number | null;
 };
 
 export type GetTokensRes = {
