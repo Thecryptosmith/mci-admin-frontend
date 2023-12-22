@@ -33,6 +33,7 @@ import {
   useSearchTokenBySlugQuery,
   useUpdateTokenMutation,
 } from "@src/lib/redux/services/adminApi";
+import { TokenCompanyWalletType } from "@src/types/createTokenReqPayload";
 import { CompanyWalletForEditType } from "@src/types/getFullTokenInfoRes";
 
 type TokenInfoType = {
@@ -105,6 +106,7 @@ export default function CreateTokenForm({
     isFetching: isPairFetching,
   } = useSearchPairQuery(searchPairName, {
     skip: !searchPairName,
+    refetchOnMountOrArgChange: true,
   });
 
   const { data: defaultTokenData } = useGetDefaultTokenQuery();
@@ -197,18 +199,29 @@ export default function CreateTokenForm({
 
     const companyWalletsForCreate = [...Array(walletsCount).keys()].map(
       (value) => {
-        return {
+        const walletData: TokenCompanyWalletType = {
           name: data.get(`walletName${value}`)! as string,
           networkId: Number(data.get(`network${value}`)!),
           walletAddress: data.get(`walletAddress${value}`)! as string,
           memo: data.get(`memo${value}`)
             ? (data.get(`memo${value}`) as string)
             : null,
-          walletExplorerLink:
-            (data.get(`walletExplorerLink${value}`) as string) ?? null,
-          transactionExplorerLink:
-            (data.get(`transactionExplorerLink${value}`) as string) ?? null,
+          isMemoNeeded: data.get(`isMemoNeeded${value}`) === "1",
         };
+
+        if (data.get(`walletExplorerLink${value}`)) {
+          walletData["walletExplorerLink"] = data.get(
+            `walletExplorerLink${value}`,
+          ) as string;
+        }
+
+        if (data.get(`transactionExplorerLink${value}`)) {
+          walletData["transactionExplorerLink"] = data.get(
+            `transactionExplorerLink${value}`,
+          ) as string;
+        }
+
+        return walletData;
       },
     );
 
@@ -258,12 +271,30 @@ export default function CreateTokenForm({
     event.preventDefault();
 
     const companyWalletsForEdit = companyWallets.map((wallet) => {
-      console.log({ wallet });
-      return {
-        ...wallet,
+      const walletData: TokenCompanyWalletType = {
+        name: wallet.name,
+        walletAddress: wallet.walletAddress,
         networkId: Number(wallet.networkId),
-        memo: wallet.memo ?? null,
+        memo: wallet.memo ? wallet.memo : null,
+        tokenExplorerId: wallet.tokenExplorer.id!,
+        isMemoNeeded: wallet.tokenExplorer.isMemoNeeded,
       };
+
+      if (typeof wallet.id === "number") {
+        walletData["id"] = wallet.id;
+      }
+
+      if (wallet.tokenExplorer.walletExplorerLink) {
+        walletData["walletExplorerLink"] =
+          wallet.tokenExplorer.walletExplorerLink;
+      }
+
+      if (wallet.tokenExplorer.transactionExplorerLink) {
+        walletData["transactionExplorerLink"] =
+          wallet.tokenExplorer.transactionExplorerLink;
+      }
+
+      return walletData;
     });
 
     const payload = {

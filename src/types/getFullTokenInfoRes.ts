@@ -14,18 +14,21 @@ export type CompanyWalletResType = {
   tokenExplorer: {
     walletExplorerLink: string | null;
     transactionExplorerLink: string | null;
+    isMemoNeeded: boolean;
   };
 };
 
 export type CompanyWalletForEditType = {
   id: number | string;
   name: string;
-  memo: string;
+  memo: string | null;
   walletAddress: string;
   networkId: string | number;
   tokenExplorer: {
+    id?: number;
     walletExplorerLink: string | null;
     transactionExplorerLink: string | null;
+    isMemoNeeded: boolean;
   };
 };
 
