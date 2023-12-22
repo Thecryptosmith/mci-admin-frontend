@@ -26,7 +26,11 @@ export type TokenCompanyWalletType = {
   networkId: number;
   walletAddress: string;
   name: string;
+  isMemoNeeded: boolean;
   memo?: string | null;
+  walletExplorerLink?: string;
+  transactionExplorerLink?: string;
+  tokenExplorerId?: number;
 };
 
 export type CreateTokenReqPayload = {
