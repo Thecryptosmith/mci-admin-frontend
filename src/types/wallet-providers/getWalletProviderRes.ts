@@ -1,4 +1,6 @@
+import { WalletProviderApplicationEnum } from "@src/common/emuns/WalletProviderApplicationEnum";
 import { WalletProviderCategoryEnum } from "@src/common/emuns/WalletProviderCategoryEnum";
+import { WalletProviderCustodyEnum } from "@src/common/emuns/WalletProviderCustodyEnum";
 import { NetworkWithTokens } from "@src/types/wallet-providers/network-with-tokens";
 
 type WalletProviderTokenInfo = {
@@ -23,4 +25,7 @@ export type GetWalletProviderRes = {
   tokensInfo: WalletProviderTokenInfo[];
   networks: NetworkWithTokens[];
   logo: WalletProviderLogo;
+  custody: WalletProviderCustodyEnum;
+  staking: boolean;
+  application: WalletProviderApplicationEnum;
 };

@@ -12,7 +12,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import Select from "@mui/material/Select/Select";
 import TextField from "@mui/material/TextField";
 import AssetsSelect from "@src/app/components/OrderFilters/AssetsSelect";
-import { useGetAllNetworksQuery } from "@src/lib/redux/services/adminApi";
+import { GetNetworksListRes } from "@src/types/getNetworksListRes";
 import { TokenData } from "@src/types/getTokensRes";
 import { NetworkWithTokens } from "@src/types/wallet-providers/network-with-tokens";
 
@@ -20,6 +20,7 @@ type SelectNetworksWithTokensProps = {
   network: NetworkWithTokens;
   index: number;
   setNetworksWithTokens: Dispatch<SetStateAction<NetworkWithTokens[]>>;
+  networksData: GetNetworksListRes;
   isEdit?: boolean;
 };
 
@@ -27,10 +28,9 @@ export default function SelectNetworksWithTokens({
   network,
   index,
   setNetworksWithTokens,
+  networksData,
   isEdit = false,
 }: SelectNetworksWithTokensProps) {
-  const { data: networksData } = useGetAllNetworksQuery();
-
   const [selectedNetwork, setSelectedNetwork] = useState<number | string>(() =>
     isEdit && networksData && network.data.id > 0 ? network.data.id : "",
   );

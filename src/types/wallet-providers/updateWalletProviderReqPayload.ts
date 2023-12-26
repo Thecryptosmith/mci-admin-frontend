@@ -1,4 +1,6 @@
+import { WalletProviderApplicationEnum } from "@src/common/emuns/WalletProviderApplicationEnum";
 import { WalletProviderCategoryEnum } from "@src/common/emuns/WalletProviderCategoryEnum";
+import { WalletProviderCustodyEnum } from "@src/common/emuns/WalletProviderCustodyEnum";
 import { NetworkWithTokensPayload } from "@src/types/wallet-providers/network-with-tokens";
 
 export type UpdateWalletProviderReqPayload = {
@@ -12,4 +14,7 @@ export type UpdateWalletProviderReqPayload = {
   category: WalletProviderCategoryEnum;
   file: number;
   networks: NetworkWithTokensPayload[];
+  custody: WalletProviderCustodyEnum;
+  staking: boolean;
+  application: WalletProviderApplicationEnum;
 };
