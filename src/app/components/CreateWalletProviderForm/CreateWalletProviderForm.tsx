@@ -20,10 +20,13 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import SelectNetworksWithTokens from "@src/app/components/CreateWalletProviderForm/SelectNetworksWithTokens/SelectNetworksWithTokens";
 import EmptyTextarea from "@src/app/components/CustomTextArea/CustomTextArea";
+import { WalletProviderApplicationEnum } from "@src/common/emuns/WalletProviderApplicationEnum";
 import { WalletProviderCategoryEnum } from "@src/common/emuns/WalletProviderCategoryEnum";
+import { WalletProviderCustodyEnum } from "@src/common/emuns/WalletProviderCustodyEnum";
 import {
   useCreateWalletProviderLogoMutation,
   useCreateWalletProviderMutation,
+  useGetAllNetworksQuery,
   useGetWalletProviderQuery,
   useUpdateWalletProviderMutation,
 } from "@src/lib/redux/services/adminApi";
@@ -33,6 +36,9 @@ import {
   NetworkWithTokensPayload,
 } from "@src/types/wallet-providers/network-with-tokens";
 import { UpdateWalletProviderReqPayload } from "@src/types/wallet-providers/updateWalletProviderReqPayload";
+
+const tokenCustody = Object.values(WalletProviderCustodyEnum);
+const tokenApplications = Object.values(WalletProviderApplicationEnum);
 
 const initialNetworkWithTokens = {
   id: Date.now().toString(),
@@ -63,7 +69,11 @@ export default function CreateWalletProviderForm({
   const [fileId, setFileId] = useState<number>(0);
   const [networksWithTokens, setNetworksWithTokens] = useState<
     NetworkWithTokens[]
-  >([initialNetworkWithTokens]);
+  >(!isEdit ? [initialNetworkWithTokens] : []);
+  const [custody, setCustody] = useState<WalletProviderCustodyEnum>();
+  const [staking, setStaking] = useState<boolean>();
+  const [application, setApplication] =
+    useState<WalletProviderApplicationEnum>();
 
   const [createWalletProvider, { isLoading }] =
     useCreateWalletProviderMutation();
@@ -71,6 +81,8 @@ export default function CreateWalletProviderForm({
   const [createWalletProviderLogo] = useCreateWalletProviderLogoMutation();
 
   const { data } = useGetWalletProviderQuery(id!, { skip: !isEdit || !id });
+
+  const { data: networksData } = useGetAllNetworksQuery();
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -85,6 +97,9 @@ export default function CreateWalletProviderForm({
       setAbout(data.about);
       setLogo(data.logo.key);
       setFileId(data.logo.id);
+      setCustody(data.custody);
+      setStaking(data.staking);
+      setApplication(data.application);
 
       setNetworksWithTokens(data.networks);
     }
@@ -115,6 +130,7 @@ export default function CreateWalletProviderForm({
 
           setLogo(data.key);
           setFileId(data.id);
+          setAbout("");
         })
         .catch((e) => {
           toast.error(JSON.stringify(e?.data?.message));
@@ -180,6 +196,9 @@ export default function CreateWalletProviderForm({
       file: fileId,
       category: category as WalletProviderCategoryEnum,
       networks: newNetworksWithTokens,
+      custody: custody!,
+      staking: staking!,
+      application: application!,
     };
 
     updateWalletProvider(payload)
@@ -238,6 +257,9 @@ export default function CreateWalletProviderForm({
     }, [] as NetworkWithTokensPayload[]);
 
     data.append("category", category);
+    data.append("custody", custody as string);
+    data.append("staking", `${staking}`);
+    data.append("application", application as string);
     data.append("networks", JSON.stringify(newNetworksWithTokens));
 
     createWalletProvider(data)
@@ -256,6 +278,9 @@ export default function CreateWalletProviderForm({
           { ...initialNetworkWithTokens, id: Date.now().toString() },
         ]);
         setCategory("");
+        setCustody(undefined);
+        setStaking(undefined);
+        setApplication(undefined);
         formRef.current && formRef.current.reset();
       })
       .catch((e) => {
@@ -378,6 +403,68 @@ export default function CreateWalletProviderForm({
             />
           </Grid>
 
+          <Grid item xs={12} sm={4}>
+            <FormControl fullWidth required>
+              <InputLabel id="custody-select-label">Custody</InputLabel>
+              <Select
+                labelId="custody-select-label"
+                id="custody-select"
+                value={custody ?? ""}
+                label="Custody"
+                onChange={(e) =>
+                  setCustody(e.target.value as WalletProviderCustodyEnum)
+                }
+              >
+                {tokenCustody.map((custody) => (
+                  <MenuItem key={custody} value={custody}>
+                    {custody}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <FormControl fullWidth required>
+              <InputLabel id="application-select-label">Application</InputLabel>
+              <Select
+                labelId="application-select-label"
+                id="application-select"
+                value={application ?? ""}
+                label="Application"
+                onChange={(e) =>
+                  setApplication(
+                    e.target.value as WalletProviderApplicationEnum,
+                  )
+                }
+              >
+                {tokenApplications.map((application) => (
+                  <MenuItem key={application} value={application}>
+                    {application}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <FormControl fullWidth required>
+              <InputLabel id="staking-select-label">Staking</InputLabel>
+              <Select
+                labelId="staking-select-label"
+                id="staking-select"
+                value={staking ?? ""}
+                label="Staking"
+                onChange={(e) =>
+                  setStaking((e.target.value as string) === "true")
+                }
+              >
+                <MenuItem value={"true"}>Yes</MenuItem>
+                <MenuItem value={"false"}>No</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
           <Grid item xs={12}>
             {isEdit && data && (
               <EmptyTextarea
@@ -423,15 +510,32 @@ export default function CreateWalletProviderForm({
             <Divider />
           </Grid>
 
-          {networksWithTokens.map((network, index) => (
-            <SelectNetworksWithTokens
-              key={network.id}
-              network={network}
-              index={index}
-              setNetworksWithTokens={setNetworksWithTokens}
-              isEdit={isEdit}
-            />
-          ))}
+          {isEdit &&
+            networksWithTokens.length > 0 &&
+            networksData &&
+            networksWithTokens.map((network, index) => (
+              <SelectNetworksWithTokens
+                key={network.id}
+                network={network}
+                index={index}
+                setNetworksWithTokens={setNetworksWithTokens}
+                networksData={networksData}
+                isEdit={isEdit}
+              />
+            ))}
+
+          {!isEdit &&
+            networksData &&
+            networksWithTokens.map((network, index) => (
+              <SelectNetworksWithTokens
+                key={network.id}
+                network={network}
+                index={index}
+                setNetworksWithTokens={setNetworksWithTokens}
+                networksData={networksData}
+                isEdit={isEdit}
+              />
+            ))}
 
           <Grid item xs={12} sm={4}>
             <Button onClick={handleAddMore}>Add more</Button>
