@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Box from "@mui/material/Box";
+import { SelectChangeEvent } from "@mui/material/Select";
 import CompanyWalletInfo from "@src/app/components/CompanyWalletInfo/CompanyWalletInfo";
 import OrderActions from "@src/app/components/OrderActions/OrderActions";
 import OrderInfo from "@src/app/components/OrderInfo/OrderInfo";
@@ -11,10 +12,13 @@ import OrderLogs from "@src/app/components/OrderLogs/OrderLogs";
 import PriceInfo from "@src/app/components/PriceInfo/PriceInfo";
 import TokenInfo from "@src/app/components/TokenInfo/TokenInfo";
 import UserWalletInfo from "@src/app/components/UserWalletInfo/UserWalletInfo";
+import { ExchangeOrderStatusEnum } from "@src/common/emuns/ExchangeOrderStatusEnum";
 import { NotificationTypeEnum } from "@src/common/emuns/NotificationTypeEnum";
+import { OrderStatusEnum } from "@src/common/emuns/OrderStatusEnum";
 import { OrderTypeEnum } from "@src/common/emuns/OrderTypeEnum";
 import useExitPrompt from "@src/common/hooks/useExitPrompt";
 import {
+  useChangeOrderStatusMutation,
   useGetExchangeOrderQuery,
   useSendReviewingNotificationMutation,
 } from "@src/lib/redux/services/adminApi";
@@ -32,7 +36,17 @@ export default function ExchangeOrderPage({ params }: ExchangeOrderPageProps) {
 
   const { data, isSuccess, isError } = useGetExchangeOrderQuery(params.id);
 
+  const [orderStatus, setOrderStatus] = useState<OrderStatusEnum>();
+
+  const [changeOrderStatus] = useChangeOrderStatusMutation();
+
   const [sendReviewingNotification] = useSendReviewingNotificationMutation();
+
+  useEffect(() => {
+    if (data) {
+      setOrderStatus(data.orderStatus);
+    }
+  }, [data]);
 
   useEffect(() => {
     setShowExitPrompt(true);
@@ -57,6 +71,20 @@ export default function ExchangeOrderPage({ params }: ExchangeOrderPageProps) {
     }
   }, [isError]);
 
+  const handleOrderStatusChange = (e: SelectChangeEvent) => {
+    setOrderStatus(e.target.value as OrderStatusEnum);
+  };
+
+  const handleChangeStatusSubmit = () => {
+    if (orderStatus && data) {
+      changeOrderStatus({
+        id: params.id,
+        type: data.orderType,
+        status: orderStatus,
+      });
+    }
+  };
+
   return (
     <>
       {data ? (
@@ -68,6 +96,10 @@ export default function ExchangeOrderPage({ params }: ExchangeOrderPageProps) {
           />
 
           <OrderInfo
+            orderStatus={orderStatus}
+            handleOrderStatusChange={handleOrderStatusChange}
+            statusValues={Object.values(ExchangeOrderStatusEnum)}
+            handleChangeStatusSubmit={handleChangeStatusSubmit}
             data={{
               orderCode: data.orderCode,
               orderStatus: data.orderStatus,

@@ -23,6 +23,7 @@ import { GetUsersQueryParams } from "@src/types/getUsersQueryParams";
 import { GetUsersRes } from "@src/types/getUsersRes";
 import { GetUserWalletsQueryParams } from "@src/types/getUserWalletsQueryParams";
 import { GetUserWalletsRes } from "@src/types/getUserWalletsRes";
+import { ChangeOrderStatusReqPayload } from "@src/types/orders/changeOrderStatusReqPayload";
 import {
   BuyOrderType,
   ExchangeOrderType,
@@ -500,6 +501,17 @@ export const adminApi = createApi({
         body,
       }),
     }),
+
+    changeOrderStatus: builder.mutation<void, ChangeOrderStatusReqPayload>({
+      query: ({ id, type, ...body }) => ({
+        url: `/order/${type}/${id}/status`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Admin", id: `${arg.type.toUpperCase()}-ORDER` },
+      ],
+    }),
   }),
 });
 
@@ -542,4 +554,5 @@ export const {
   useGetWalletProviderQuery,
   useUpdateWalletProviderMutation,
   useCreateWalletProviderLogoMutation,
+  useChangeOrderStatusMutation,
 } = adminApi;
