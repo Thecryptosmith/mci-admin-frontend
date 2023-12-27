@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 import Box from "@mui/material/Box/Box";
 import Button from "@mui/material/Button/Button";
@@ -285,6 +286,12 @@ export default function UserPage({ params }: UserPageProps) {
               <Button variant={"contained"} onClick={handleOpenCreateIncident}>
                 Create incident
               </Button>
+            </ListItem>
+
+            <ListItem>
+              <Link href={`/orders?userId=${params.id}`} target="_blank">
+                <Button variant={"outlined"}>View all orders</Button>
+              </Link>
             </ListItem>
           </List>
         </Drawer>

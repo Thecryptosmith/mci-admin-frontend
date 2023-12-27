@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import Box from "@mui/material/Box/Box";
 import Button from "@mui/material/Button";
@@ -54,6 +54,10 @@ export default function OrdersList() {
 
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
+  const userId = searchParams.get("userId");
+
   const notificationData = useSelector(selectNotificationData);
 
   const { data } = useGetOrdersQuery(
@@ -92,10 +96,16 @@ export default function OrdersList() {
   }, [data]);
 
   useEffect(() => {
-    setPayload({
-      orderStatuses: [OrderStatusEnum.PENDING_ADMIN_APPROVAL],
-    });
-  }, []);
+    const initialPayload: GetOrdersQueryParams = {};
+
+    if (userId) {
+      initialPayload.userId = Number(userId);
+    } else {
+      initialPayload.orderStatuses = [OrderStatusEnum.PENDING_ADMIN_APPROVAL];
+    }
+
+    setPayload(initialPayload);
+  }, [userId]);
 
   const handleChangePage = (nextPage: number) => {
     setPage(nextPage);
@@ -241,6 +251,7 @@ export default function OrdersList() {
           anchor="right"
         >
           <OrderFilters
+            userId={userId}
             setPayload={setPayload}
             setPage={setPage}
             setOffset={setOffset}
