@@ -133,6 +133,7 @@ export const adminApi = createApi({
         orderTypes,
         incomingAssets,
         outgoingAssets,
+        userId,
       }) => {
         const queryParams = new URLSearchParams();
 
@@ -164,6 +165,7 @@ export const adminApi = createApi({
         endDate && queryParams.set("endDate", endDate);
         limit && queryParams.set("limit", `${limit}`);
         (offset || offset === 0) && queryParams.set("offset", `${offset}`);
+        userId && queryParams.set("userId", `${userId}`);
 
         return {
           url: "/order",

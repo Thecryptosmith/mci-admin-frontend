@@ -10,4 +10,5 @@ export type GetOrdersQueryParams = {
   orderTypes?: OrderTypeEnum[];
   incomingAssets?: string[];
   outgoingAssets?: string[];
+  userId?: number;
 };
