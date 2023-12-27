@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { Dayjs } from "dayjs";
 
 import Box from "@mui/material/Box/Box";
@@ -36,7 +35,9 @@ export default function OrderFilters({
 }: OrderFiltersProps) {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const [orderStatuses, setOrderStatuses] = React.useState<string[]>([]);
+  const [orderStatuses, setOrderStatuses] = React.useState<string[]>(
+    userId ? [] : [OrderStatusEnum.PENDING_ADMIN_APPROVAL],
+  );
   const [orderTypes, setOrderTypes] = React.useState<string[]>([]);
   const [selectedIncomingAssets, setSelectedIncomingAssets] = useState<
     TokenData[]
@@ -44,8 +45,6 @@ export default function OrderFilters({
   const [selectedOutgoingAssets, setSelectedOutgoingAssets] = useState<
     TokenData[]
   >([]);
-
-  const router = useRouter();
 
   useEffect(() => {
     if (!userId) {
@@ -72,11 +71,15 @@ export default function OrderFilters({
   };
 
   const handleResetFilters = () => {
-    router.replace("/orders");
+    const payload: GetOrdersQueryParams = {};
+
+    if (userId) {
+      payload.userId = Number(userId);
+    }
 
     setPage(0);
     setOffset(0);
-    setPayload({});
+    setPayload(payload);
     setStartDate(null);
     setEndDate(null);
     setOrderStatuses([]);
