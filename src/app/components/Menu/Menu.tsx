@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import Ballot from "@mui/icons-material/Ballot";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
 import FeaturedPlayListIcon from "@mui/icons-material/FeaturedPlayList";
 import Group from "@mui/icons-material/Group";
 import Groups3Icon from "@mui/icons-material/Groups3";
@@ -41,6 +42,11 @@ const LINKS = [
     text: "Wallet Providers",
     href: "/wallet-providers",
     icon: FeaturedPlayListIcon,
+  },
+  {
+    text: "Compliance Requests",
+    href: "/compliance-requests",
+    icon: FactCheckIcon,
   },
 ];
 

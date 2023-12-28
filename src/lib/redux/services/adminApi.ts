@@ -35,6 +35,8 @@ import { SendReviewingNotificationReqPayload } from "@src/types/sendReviewingNot
 import { UpdateTrendingTokensReqPayload } from "@src/types/updateTrendingTokensReqPayload";
 import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificationReqPayload";
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
+import { GetAllVerificationRequestsQueryParams } from "@src/types/verification-requests/getAllVerificationRequestsQueryParams";
+import { GetAllVerificationRequestsRes } from "@src/types/verification-requests/getAllVerificationRequestsRes";
 import { GetAllWalletProvidersQueryParams } from "@src/types/wallet-providers/getAllWalletProvidersQueryParams";
 import { GetAllWalletProvidersRes } from "@src/types/wallet-providers/getAllWalletProvidersRes";
 import { GetNetworkTokensParams } from "@src/types/wallet-providers/getNetworkTokensParams";
@@ -514,6 +516,32 @@ export const adminApi = createApi({
         { type: "Admin", id: `${arg.type.toUpperCase()}-ORDER` },
       ],
     }),
+
+    getAllVerificationRequests: builder.query<
+      GetAllVerificationRequestsRes,
+      GetAllVerificationRequestsQueryParams
+    >({
+      query: ({ limit, offset, statuses, orderField, orderDirection }) => {
+        const queryParams = new URLSearchParams();
+
+        if (statuses && statuses.length > 0) {
+          statuses.forEach((status) => {
+            queryParams.append("status", status);
+          });
+        }
+
+        orderField && queryParams.set("orderField", orderField);
+        orderDirection && queryParams.set("orderDirection", orderDirection);
+        limit && queryParams.set("limit", `${limit}`);
+        (offset || offset === 0) && queryParams.set("offset", `${offset}`);
+
+        return {
+          url: `/user-verification-request`,
+          method: "GET",
+          params: queryParams,
+        };
+      },
+    }),
   }),
 });
 
@@ -557,4 +585,5 @@ export const {
   useUpdateWalletProviderMutation,
   useCreateWalletProviderLogoMutation,
   useChangeOrderStatusMutation,
+  useGetAllVerificationRequestsQuery,
 } = adminApi;

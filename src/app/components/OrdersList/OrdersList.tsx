@@ -16,6 +16,7 @@ import TableContainer from "@mui/material/TableContainer/TableContainer";
 import TableHead from "@mui/material/TableHead/TableHead";
 import TablePagination from "@mui/material/TablePagination/TablePagination";
 import TableRow from "@mui/material/TableRow/TableRow";
+import Typography from "@mui/material/Typography";
 import OrderFilters from "@src/app/components/OrderFilters/OrderFilters";
 import { OrderStatusEnum } from "@src/common/emuns/OrderStatusEnum";
 import { NotificationContext } from "@src/common/globals/Contexts";
@@ -142,6 +143,8 @@ export default function OrdersList() {
           paddingBottom: "70px",
         }}
       >
+        {userId && <Typography>User ID: {userId}</Typography>}
+
         {orders ? (
           <Paper elevation={3} sx={{ p: 1 }}>
             <TableContainer>
