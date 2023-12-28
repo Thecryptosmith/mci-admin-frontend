@@ -9,7 +9,6 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { OrderStatusEnum } from "@src/common/emuns/OrderStatusEnum";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -22,20 +21,23 @@ const MenuProps = {
   },
 };
 
-type OrderStatusesSelectProps = {
-  orderStatuses: string[];
-  setOrderStatuses: React.Dispatch<React.SetStateAction<string[]>>;
+type SimpleMultiSelectProps = {
+  label: string;
+  itemsList: string[];
+  selectedItems: string[];
+  setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-export default function OrderStatusesSelect({
-  orderStatuses,
-  setOrderStatuses,
-}: OrderStatusesSelectProps) {
-  const handleChange = (event: SelectChangeEvent<typeof orderStatuses>) => {
-    const {
-      target: { value },
-    } = event;
-    setOrderStatuses(
+export default function SimpleMultiSelect({
+  label,
+  itemsList,
+  selectedItems,
+  setSelectedItems,
+}: SimpleMultiSelectProps) {
+  const handleChange = ({
+    target: { value },
+  }: SelectChangeEvent<typeof selectedItems>) => {
+    setSelectedItems(
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value,
     );
@@ -44,14 +46,14 @@ export default function OrderStatusesSelect({
   return (
     <>
       <FormControl fullWidth>
-        <InputLabel id="order-statuses-label">Status</InputLabel>
+        <InputLabel id="simple-miltiselect-label">{label}</InputLabel>
         <Select
-          labelId="order-statuses-label"
-          id="order-statuses"
+          labelId="simple-miltiselect-label"
+          id="simple-miltiselect"
           multiple
-          value={orderStatuses}
+          value={selectedItems}
           onChange={handleChange}
-          input={<OutlinedInput label="Status" />}
+          input={<OutlinedInput label={label} />}
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {selected.map((value) => (
@@ -62,7 +64,7 @@ export default function OrderStatusesSelect({
                     e.stopPropagation();
                   }}
                   onDelete={() => {
-                    setOrderStatuses((prevState) =>
+                    setSelectedItems((prevState) =>
                       prevState.filter((item) => item !== value),
                     );
                   }}
@@ -72,10 +74,10 @@ export default function OrderStatusesSelect({
           )}
           MenuProps={MenuProps}
         >
-          {Object.values(OrderStatusEnum).map((status) => (
-            <MenuItem key={status} value={status}>
-              <Checkbox checked={orderStatuses.indexOf(status) > -1} />
-              <ListItemText primary={status} />
+          {itemsList.map((item) => (
+            <MenuItem key={item} value={item}>
+              <Checkbox checked={selectedItems.indexOf(item) > -1} />
+              <ListItemText primary={item} />
             </MenuItem>
           ))}
         </Select>

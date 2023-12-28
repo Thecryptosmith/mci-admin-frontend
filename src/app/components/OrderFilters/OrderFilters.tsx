@@ -11,14 +11,16 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import AssetsSelect from "@src/app/components/OrderFilters/AssetsSelect";
-import OrderStatusesSelect from "@src/app/components/OrderFilters/OrderStatusesSelect";
 import OrderTypesSelect from "@src/app/components/OrderFilters/OrderTypesSelect";
+import SimpleMultiSelect from "@src/app/components/SimpleMultiSelect/SimpleMultiSelect";
 import { OrderStatusEnum } from "@src/common/emuns/OrderStatusEnum";
 import { OrderTypeEnum } from "@src/common/emuns/OrderTypeEnum";
 import { GetOrdersQueryParams } from "@src/types/getOrdersQueryParams";
 import { TokenData } from "@src/types/getTokensRes";
 
 import "dayjs/locale/en-gb";
+
+const availableOrderStatuses = Object.values(OrderStatusEnum);
 
 type OrderFiltersProps = {
   userId: string | null;
@@ -115,9 +117,11 @@ export default function OrderFilters({
         </ListItem>
 
         <ListItem>
-          <OrderStatusesSelect
-            orderStatuses={orderStatuses}
-            setOrderStatuses={setOrderStatuses}
+          <SimpleMultiSelect
+            label={"Status"}
+            itemsList={availableOrderStatuses}
+            selectedItems={orderStatuses}
+            setSelectedItems={setOrderStatuses}
           />
         </ListItem>
 
