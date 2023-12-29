@@ -8,7 +8,7 @@ import ListItem from "@mui/material/ListItem/ListItem";
 import Typography from "@mui/material/Typography/Typography";
 import SimpleMultiSelect from "@src/app/components/SimpleMultiSelect/SimpleMultiSelect";
 import { UserVerificationRequestStatusEnum } from "@src/common/emuns/UserVerificationRequestStatusEnum";
-import { GetAllVerificationRequestsQueryParams } from "@src/types/verification-requests/getAllVerificationRequestsQueryParams";
+import { GetAllVerificationRequestsQueryParams } from "@src/types/compliance-requests/getAllVerificationRequestsQueryParams";
 
 const availableUserVerificationRequestStatuses = Object.values(
   UserVerificationRequestStatusEnum,
@@ -31,8 +31,6 @@ export default function VerificationRequestFilters({
     selectedUserVerificationRequestStatuses,
     setSelectedUserVerificationRequestStatuses,
   ] = useState<string[]>([]);
-
-  console.log(selectedUserVerificationRequestStatuses);
 
   const handleFilterApply = () => {
     setPage(0);

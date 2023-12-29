@@ -5,6 +5,9 @@ import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
 import { ChangeUserWalletStatusReqPayload } from "@src/types/changeUserWalletStatusReqPayload";
 import { CoinMarketTokenInfo } from "@src/types/CoinMarketToken";
+import { GetAllVerificationRequestsQueryParams } from "@src/types/compliance-requests/getAllVerificationRequestsQueryParams";
+import { GetAllVerificationRequestsRes } from "@src/types/compliance-requests/getAllVerificationRequestsRes";
+import { GetComplianceRequestRes } from "@src/types/compliance-requests/getComplianceRequestRes";
 import { CreateAdminReqPayload } from "@src/types/createAdminReqPayload";
 import { CreateIncidentRecordReqPayload } from "@src/types/createIncidentRecordReqPayload";
 import { CreateNetworkReqPayload } from "@src/types/createNetworkReqPayload";
@@ -35,8 +38,6 @@ import { SendReviewingNotificationReqPayload } from "@src/types/sendReviewingNot
 import { UpdateTrendingTokensReqPayload } from "@src/types/updateTrendingTokensReqPayload";
 import { UpdateUserVerificationReqPayload } from "@src/types/updateUserVerificationReqPayload";
 import { GetUserForVerificationRes } from "@src/types/userVerificationTypes";
-import { GetAllVerificationRequestsQueryParams } from "@src/types/verification-requests/getAllVerificationRequestsQueryParams";
-import { GetAllVerificationRequestsRes } from "@src/types/verification-requests/getAllVerificationRequestsRes";
 import { GetAllWalletProvidersQueryParams } from "@src/types/wallet-providers/getAllWalletProvidersQueryParams";
 import { GetAllWalletProvidersRes } from "@src/types/wallet-providers/getAllWalletProvidersRes";
 import { GetNetworkTokensParams } from "@src/types/wallet-providers/getNetworkTokensParams";
@@ -541,6 +542,15 @@ export const adminApi = createApi({
           params: queryParams,
         };
       },
+      providesTags: [{ type: "Admin", id: "COMPLIANCE_REQUESTS" }],
+    }),
+
+    getComplianceRequest: builder.query<GetComplianceRequestRes, number>({
+      query: (id) => ({
+        url: `/user-verification-request/${id}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "COMPLIANCE_REQUEST" }],
     }),
   }),
 });
@@ -586,4 +596,5 @@ export const {
   useCreateWalletProviderLogoMutation,
   useChangeOrderStatusMutation,
   useGetAllVerificationRequestsQuery,
+  useGetComplianceRequestQuery,
 } = adminApi;

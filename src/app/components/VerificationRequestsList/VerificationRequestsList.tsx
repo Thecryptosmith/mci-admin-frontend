@@ -20,8 +20,8 @@ import TablePagination from "@mui/material/TablePagination/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import VerificationRequestFilters from "@src/app/components/VerificationRequestFilters/VerificationRequestFilters";
 import { useGetAllVerificationRequestsQuery } from "@src/lib/redux/services/adminApi";
-import { GetAllVerificationRequestsQueryParams } from "@src/types/verification-requests/getAllVerificationRequestsQueryParams";
-import { VerificationRequestsItem } from "@src/types/verification-requests/getAllVerificationRequestsRes";
+import { GetAllVerificationRequestsQueryParams } from "@src/types/compliance-requests/getAllVerificationRequestsQueryParams";
+import { VerificationRequestsItem } from "@src/types/compliance-requests/getAllVerificationRequestsRes";
 
 export default function VerificationRequestsList() {
   const [offset, setOffset] = useState<number>(0);
