@@ -5,6 +5,9 @@ import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
 import { ChangeUserWalletStatusReqPayload } from "@src/types/changeUserWalletStatusReqPayload";
 import { CoinMarketTokenInfo } from "@src/types/CoinMarketToken";
+import { CreateComplianceRecordReqPayload } from "@src/types/compliance-records/createComplianceRecordReqPayload";
+import { UserLimit } from "@src/types/compliance-records/userLimit";
+import { ChangeComplianceRequestStatusReqPayload } from "@src/types/compliance-requests/changeComplianceRequestStatusReqPayload";
 import { GetAllVerificationRequestsQueryParams } from "@src/types/compliance-requests/getAllVerificationRequestsQueryParams";
 import { GetAllVerificationRequestsRes } from "@src/types/compliance-requests/getAllVerificationRequestsRes";
 import { GetComplianceRequestRes } from "@src/types/compliance-requests/getComplianceRequestRes";
@@ -542,7 +545,7 @@ export const adminApi = createApi({
           params: queryParams,
         };
       },
-      providesTags: [{ type: "Admin", id: "COMPLIANCE_REQUESTS" }],
+      providesTags: [{ type: "Admin", id: "COMPLIANCE-REQUESTS" }],
     }),
 
     getComplianceRequest: builder.query<GetComplianceRequestRes, number>({
@@ -550,7 +553,55 @@ export const adminApi = createApi({
         url: `/user-verification-request/${id}`,
         method: "GET",
       }),
-      providesTags: [{ type: "Admin", id: "COMPLIANCE_REQUEST" }],
+      providesTags: [{ type: "Admin", id: "COMPLIANCE-REQUEST" }],
+    }),
+
+    getActiveUserLimit: builder.query<UserLimit, number>({
+      query: (userId) => ({
+        url: `/compliance-record/${userId}/active-limit`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "USER-LIMIT" }],
+    }),
+
+    createComplianceRecord: builder.mutation<
+      void,
+      CreateComplianceRecordReqPayload
+    >({
+      query: (body) => ({
+        url: "/compliance-record",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [
+        { type: "Admin", id: "COMPLIANCE-REQUEST" },
+        { type: "Admin", id: "COMPLIANCE-REQUESTS" },
+        { type: "Admin", id: "COMPLIANCE-RECORDS" },
+      ],
+    }),
+
+    changeComplianceRequestStatus: builder.mutation<
+      void,
+      ChangeComplianceRequestStatusReqPayload
+    >({
+      query: ({ id, status }) => ({
+        url: `/user-verification-request/${id}/status`,
+        method: "PATCH",
+        body: status ? { status } : undefined,
+      }),
+      invalidatesTags: [
+        { type: "Admin", id: "COMPLIANCE-REQUEST" },
+        { type: "Admin", id: "COMPLIANCE-REQUESTS" },
+      ],
+    }),
+
+    createComplianceRecordWithRequest: builder.mutation<void, FormData>({
+      query: (body) => ({
+        url: "/compliance-record/with-request",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Admin", id: "COMPLIANCE-REQUESTS" }],
     }),
   }),
 });
@@ -597,4 +648,8 @@ export const {
   useChangeOrderStatusMutation,
   useGetAllVerificationRequestsQuery,
   useGetComplianceRequestQuery,
+  useGetActiveUserLimitQuery,
+  useCreateComplianceRecordMutation,
+  useChangeComplianceRequestStatusMutation,
+  useCreateComplianceRecordWithRequestMutation,
 } = adminApi;

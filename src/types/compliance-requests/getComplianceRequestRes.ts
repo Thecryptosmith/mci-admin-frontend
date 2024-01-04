@@ -1,5 +1,6 @@
 import { EmploymentStatus } from "@src/common/emuns/EmploymentStatusEnum";
 import { UserVerificationRequestStatusEnum } from "@src/common/emuns/UserVerificationRequestStatusEnum";
+import { ComplianceRecord } from "@src/types/compliance-records/complianceRecord";
 
 type File = {
   id: number;
@@ -8,8 +9,8 @@ type File = {
 
 export type GetComplianceRequestRes = {
   id: number;
+  sender: string;
   createdAt: string;
-  updatedAt: string;
   status: UserVerificationRequestStatusEnum;
   sowCompleted: boolean;
   socCompleted: boolean;
@@ -20,13 +21,16 @@ export type GetComplianceRequestRes = {
   socCryptoExperience: string;
   socCryptoValue: number;
   socIntentionToSell: string;
+  admin: {
+    id: number;
+    email: string;
+  };
   user: {
     id: number;
     email: string;
-    referralId: null;
-    customerId: string;
     timezone: string;
     currencyCode: string;
+    complianceRecords: ComplianceRecord[];
   };
   sowFiles: File[];
   socFiles: File[];

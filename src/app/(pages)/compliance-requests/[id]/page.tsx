@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -15,29 +17,48 @@ import ListItemAvatar from "@mui/material/ListItemAvatar/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText/ListItemText";
 import Paper from "@mui/material/Paper/Paper";
 import Typography from "@mui/material/Typography";
-import { useGetComplianceRequestQuery } from "@src/lib/redux/services/adminApi";
+import ComplianceRecords from "@src/app/components/ComplianceRecords/ComplianceRecords";
+import CreateComplianceRecordModalForm from "@src/app/components/CreateComplianceRecordModalForm/CreateComplianceRecordModalForm";
+import { UserVerificationRequestStatusEnum } from "@src/common/emuns/UserVerificationRequestStatusEnum";
+import {
+  useChangeComplianceRequestStatusMutation,
+  useGetComplianceRequestQuery,
+} from "@src/lib/redux/services/adminApi";
 
 export default function ComplianceRequestPage() {
+  const currentAdminEmail = localStorage.getItem("email");
   const { id } = useParams();
 
   const { data } = useGetComplianceRequestQuery(+id);
 
-  console.log(data);
+  const [changeComplianceRequestStatus] =
+    useChangeComplianceRequestStatusMutation();
+
+  useEffect(() => {
+    if (data && data.status === UserVerificationRequestStatusEnum.PENDING) {
+      changeComplianceRequestStatus({ id: +id });
+    }
+  }, [changeComplianceRequestStatus, data, id]);
+
+  const handleReject = () => {
+    changeComplianceRequestStatus({
+      id: +id,
+      status: UserVerificationRequestStatusEnum.UNAPPROVED,
+    })
+      .unwrap()
+      .then(() => {
+        toast.success("Compliance request successfully rejected");
+      })
+      .catch((e) => {
+        toast.error(JSON.stringify(e?.data?.message));
+      });
+  };
 
   return (
     <>
       {data && (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <div
-            style={{
-              height: "50px",
-              width: "100%",
-              backgroundColor: "lightgray",
-              marginBottom: "10px",
-            }}
-          >
-            Compliance records list placeholder
-          </div>
+          <ComplianceRecords data={data.user.complianceRecords} hideRequest />
 
           <Paper elevation={3} sx={{ p: 2 }}>
             <Typography>
@@ -48,6 +69,11 @@ export default function ComplianceRequestPage() {
             <Typography>
               <b>Status: </b>
               {data.status}
+            </Typography>
+
+            <Typography>
+              <b>Reviewing by: </b>
+              {data?.admin?.email ?? ""}
             </Typography>
 
             <Divider sx={{ mt: 1, mb: 1 }} />
@@ -157,13 +183,25 @@ export default function ComplianceRequestPage() {
             </List>
           </Paper>
 
-          <Button variant="contained">
-            Create compliance record and approve request
-          </Button>
+          {data.status === UserVerificationRequestStatusEnum.REVIEWING &&
+            data.admin &&
+            data.admin.email === currentAdminEmail && (
+              <>
+                <CreateComplianceRecordModalForm
+                  userId={data.user.id}
+                  buttonTitle={"Create compliance record and approve request"}
+                  userVerificationRequestId={+id}
+                />
 
-          <Button variant="contained" color="error">
-            Reject request
-          </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleReject}
+                >
+                  Reject request
+                </Button>
+              </>
+            )}
         </Box>
       )}
     </>

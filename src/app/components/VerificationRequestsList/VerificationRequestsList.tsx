@@ -19,11 +19,14 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import VerificationRequestFilters from "@src/app/components/VerificationRequestFilters/VerificationRequestFilters";
+import { UserVerificationRequestStatusEnum } from "@src/common/emuns/UserVerificationRequestStatusEnum";
 import { useGetAllVerificationRequestsQuery } from "@src/lib/redux/services/adminApi";
 import { GetAllVerificationRequestsQueryParams } from "@src/types/compliance-requests/getAllVerificationRequestsQueryParams";
 import { VerificationRequestsItem } from "@src/types/compliance-requests/getAllVerificationRequestsRes";
 
 export default function VerificationRequestsList() {
+  const currentAdminEmail = localStorage.getItem("email");
+
   const [offset, setOffset] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [page, setPage] = useState<number>(0);
@@ -227,12 +230,17 @@ export default function VerificationRequestsList() {
                     {request.socCryptoValue ?? ""}
                   </TableCell>
                   <TableCell align="center">
-                    <Link
-                      href={`compliance-requests/${request.id}`}
-                      target="_blank"
-                    >
-                      <Button variant="contained">View</Button>
-                    </Link>
+                    {request.status ===
+                      UserVerificationRequestStatusEnum.REVIEWING &&
+                    request.admin &&
+                    request.admin.email !== currentAdminEmail ? null : (
+                      <Link
+                        href={`compliance-requests/${request.id}`}
+                        target="_blank"
+                      >
+                        <Button variant="contained">View</Button>
+                      </Link>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
