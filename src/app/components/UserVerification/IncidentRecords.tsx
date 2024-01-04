@@ -56,7 +56,9 @@ export default function IncidentRecords({ data }: IncidentRecordsProps) {
                   <TableCell align="right">{row.riskRating}</TableCell>
                   <TableCell align="right">{row.status}</TableCell>
                   <TableCell align="right">{row.description}</TableCell>
-                  <TableCell align="right">{row.updatedAt}</TableCell>
+                  <TableCell align="right">
+                    {new Date(row.updatedAt).toLocaleString()}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

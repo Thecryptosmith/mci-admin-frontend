@@ -35,7 +35,7 @@ export default function ProofOfAddressDate({
       >
         <div>
           <Typography variant="body1">
-            <b>ID Expiry Date:</b> {data.dateOfIssue}
+            <b>Expiry Date:</b> {new Date(data.dateOfIssue).toLocaleString()}
           </Typography>
 
           <UserVerificationStatus status={proofOfAddressDate} />

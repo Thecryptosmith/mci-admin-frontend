@@ -9,6 +9,8 @@ import Drawer from "@mui/material/Drawer/Drawer";
 import List from "@mui/material/List/List";
 import ListItem from "@mui/material/ListItem/ListItem";
 import Typography from "@mui/material/Typography/Typography";
+import ComplianceRecords from "@src/app/components/ComplianceRecords/ComplianceRecords";
+import CreateComplianceRecordModalForm from "@src/app/components/CreateComplianceRecordModalForm/CreateComplianceRecordModalForm";
 import CreateIncident from "@src/app/components/CreateIncident/CreateIncident";
 import CustomAlert from "@src/app/components/CustomAlert/CustomAlert";
 import IdDocument from "@src/app/components/UserVerification/IdDocument";
@@ -165,6 +167,8 @@ export default function UserPage({ params }: UserPageProps) {
               paddingBottom: "70px",
             }}
           >
+            <ComplianceRecords data={data.complianceRecords} />
+
             <IncidentRecords data={data.incidentRecords} />
 
             <PersonalInfo
@@ -292,6 +296,14 @@ export default function UserPage({ params }: UserPageProps) {
               <Link href={`/orders?userId=${params.id}`} target="_blank">
                 <Button variant={"outlined"}>View all orders</Button>
               </Link>
+            </ListItem>
+
+            <ListItem>
+              <CreateComplianceRecordModalForm
+                userId={params.id}
+                buttonTitle={"Create compliance record"}
+                withRequest
+              />
             </ListItem>
           </List>
         </Drawer>

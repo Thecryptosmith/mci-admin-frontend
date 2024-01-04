@@ -1,4 +1,5 @@
 import { VerificationStatus } from "@src/common/emuns/VerificationStatusEnum";
+import { ComplianceRecord } from "@src/types/compliance-records/complianceRecord";
 
 export type FileType = {
   id: number;
@@ -95,4 +96,5 @@ export type GetUserForVerificationRes = {
   userProofOfAddress: UserProofOfAddress;
   questionnaire: QuestionnaireType;
   incidentRecords: IncidentRecordsType[];
+  complianceRecords: ComplianceRecord[];
 };

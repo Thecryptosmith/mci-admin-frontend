@@ -51,7 +51,8 @@ export default function PersonalInfo({
           </Typography>
 
           <Typography variant="body1">
-            <b>Date Of Birth:</b> {data.personalInformation.dateOfBirth}
+            <b>Date Of Birth:</b>{" "}
+            {new Date(data.personalInformation.dateOfBirth).toLocaleString()}
           </Typography>
 
           <Typography variant="body1">

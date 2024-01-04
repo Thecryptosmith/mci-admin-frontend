@@ -35,7 +35,7 @@ export default function IdDocumentExpiry({
       >
         <div>
           <Typography variant="body1">
-            <b>ID Expiry Date:</b> {data.idExpiry}
+            <b>ID Expiry Date:</b> {new Date(data.idExpiry).toLocaleString()}
           </Typography>
 
           <UserVerificationStatus status={idDocumentExpiry} />
