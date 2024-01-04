@@ -601,7 +601,10 @@ export const adminApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: [{ type: "Admin", id: "COMPLIANCE-REQUESTS" }],
+      invalidatesTags: [
+        { type: "Admin", id: "COMPLIANCE-REQUESTS" },
+        { type: "Admin", id: "USER" },
+      ],
     }),
   }),
 });
