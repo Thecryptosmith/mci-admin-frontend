@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import Box from "@mui/material/Box";
@@ -16,7 +16,9 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import Select from "@mui/material/Select/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import ComplianceDocument from "@src/app/components/CreateComplianceRecordModalForm/ComplianceDocument/ComplianceDocument";
 import ComplianceRequestComponent from "@src/app/components/CreateComplianceRecordModalForm/ComplianceRequest/ComplianceRequestComponent";
+import ComplianceToken from "@src/app/components/CreateComplianceRecordModalForm/ComplianceToken/ComplianceToken";
 import { EmploymentStatus } from "@src/common/emuns/EmploymentStatusEnum";
 import { UserLimitTypeEnum } from "@src/common/emuns/UserLimitTypeEnum";
 import {
@@ -54,6 +56,7 @@ export default function CreateComplianceRecordModalForm({
   const [socComment, setSocComment] = useState<string>("");
   const [sowEmploymentStatus, setSowEmploymentStatus] =
     useState<EmploymentStatus>();
+  const [complianceDocuments, setComplianceDocuments] = useState<any[]>([]);
 
   const form = useRef<HTMLFormElement>(null);
 
@@ -224,7 +227,7 @@ export default function CreateComplianceRecordModalForm({
         {buttonTitle}
       </Button>
 
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} sx={{ mt: 5 }}>
         <Box
           component={"form"}
           onSubmit={withRequest ? handleSubmitWithRequest : handleSubmit}
@@ -346,6 +349,39 @@ export default function CreateComplianceRecordModalForm({
               value={socComment}
               onChange={(e) => setSocComment(e.target.value)}
             />
+
+            <Divider sx={{ mt: 2, mb: 2 }} />
+
+            <Typography>
+              <b>Compliance documents:</b>
+            </Typography>
+
+            <Box>
+              {complianceDocuments.map((doc) => (
+                <Fragment key={doc.id}>
+                  <ComplianceDocument
+                    document={doc}
+                    setDocuments={setComplianceDocuments}
+                  />
+                </Fragment>
+              ))}
+              <Button
+                sx={{ mt: 2 }}
+                variant="outlined"
+                onClick={() =>
+                  setComplianceDocuments((prevState) => [
+                    ...prevState,
+                    { id: Date.now().toString(), type: "", file: "" },
+                  ])
+                }
+              >
+                Add document
+              </Button>
+            </Box>
+
+            <Divider sx={{ mt: 2, mb: 2 }} />
+
+            <ComplianceToken />
 
             {withRequest && (
               <ComplianceRequestComponent

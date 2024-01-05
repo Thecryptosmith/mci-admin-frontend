@@ -10,6 +10,7 @@ export type TokenData = {
   marketCap?: number;
   rank?: number;
   yield?: string | number | null;
+  amount?: number;
 };
 
 export type GetTokensRes = {
