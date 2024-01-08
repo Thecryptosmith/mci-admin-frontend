@@ -5,7 +5,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel/InputLabel";
 import TokenSearchSelectInput from "@src/app/components/TokenSearchSelectInput/TokenSearchSelectInput";
-import { ComplianceTokenType } from "@src/types/compliance-records/complianceToken";
+import { ComplianceTokenType } from "@src/types/compliance-records/complianceTokenType";
 
 type ComplianceTokenProps = {
   currentToken: ComplianceTokenType;

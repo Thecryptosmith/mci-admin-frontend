@@ -11,7 +11,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import TextField from "@mui/material/TextField";
 import { useDebounce } from "@src/common/hooks/useDebounce";
 import { useGetTokensQuery } from "@src/lib/redux/services/adminApi";
-import { ComplianceTokenType } from "@src/types/compliance-records/complianceToken";
+import { ComplianceTokenType } from "@src/types/compliance-records/complianceTokenType";
 import { GetTokensQueryParams } from "@src/types/getTokensQueryParams";
 import { TokenData } from "@src/types/getTokensRes";
 

@@ -5,6 +5,7 @@ import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
 import { ChangeUserWalletStatusReqPayload } from "@src/types/changeUserWalletStatusReqPayload";
 import { CoinMarketTokenInfo } from "@src/types/CoinMarketToken";
+import { FullComplianceRecord } from "@src/types/compliance-records/fullComplianceRecord";
 import { UserLimit } from "@src/types/compliance-records/userLimit";
 import { ChangeComplianceRequestStatusReqPayload } from "@src/types/compliance-requests/changeComplianceRequestStatusReqPayload";
 import { GetAllVerificationRequestsQueryParams } from "@src/types/compliance-requests/getAllVerificationRequestsQueryParams";
@@ -594,6 +595,14 @@ export const adminApi = createApi({
             ]
           : [],
     }),
+
+    getComplianceRecord: builder.query<FullComplianceRecord, number>({
+      query: (id) => ({
+        url: `/compliance-record/${id}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Admin", id: "COMPLIANCE-RECORD" }],
+    }),
   }),
 });
 
@@ -642,4 +651,5 @@ export const {
   useGetActiveUserLimitQuery,
   useChangeComplianceRequestStatusMutation,
   useCreateComplianceRecordWithRequestMutation,
+  useGetComplianceRecordQuery,
 } = adminApi;

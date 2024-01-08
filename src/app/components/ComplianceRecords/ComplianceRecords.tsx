@@ -10,6 +10,7 @@ import TableContainer from "@mui/material/TableContainer/TableContainer";
 import TableHead from "@mui/material/TableHead/TableHead";
 import TableRow from "@mui/material/TableRow/TableRow";
 import Typography from "@mui/material/Typography/Typography";
+import ComplianceRecordModal from "@src/app/components/ComplianceRecord/ComplianceRecord";
 import { ComplianceRecord } from "@src/types/compliance-records/complianceRecord";
 
 type ComplianceRecordsProps = {
@@ -51,6 +52,7 @@ export default function ComplianceRecords({
                 <TableCell align="right">SoC Order Limit</TableCell>
                 <TableCell align="right">SoC Trading Limit</TableCell>
                 <TableCell align="right">SoC comment</TableCell>
+                <TableCell align="right">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -114,6 +116,9 @@ export default function ComplianceRecords({
                     }}
                   >
                     {record.socComment ?? ""}
+                  </TableCell>
+                  <TableCell align="right">
+                    <ComplianceRecordModal id={record.id} />
                   </TableCell>
                 </TableRow>
               ))}

@@ -25,7 +25,7 @@ import {
   useCreateComplianceRecordWithRequestMutation,
   useGetActiveUserLimitQuery,
 } from "@src/lib/redux/services/adminApi";
-import { ComplianceTokenType } from "@src/types/compliance-records/complianceToken";
+import { ComplianceTokenType } from "@src/types/compliance-records/complianceTokenType";
 import { UserLimit } from "@src/types/compliance-records/userLimit";
 import { ComplianceRequest } from "@src/types/compliance-requests/complianceRequest";
 
