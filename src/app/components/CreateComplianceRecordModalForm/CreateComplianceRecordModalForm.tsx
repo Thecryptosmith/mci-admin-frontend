@@ -22,11 +22,10 @@ import ComplianceToken from "@src/app/components/CreateComplianceRecordModalForm
 import { EmploymentStatus } from "@src/common/emuns/EmploymentStatusEnum";
 import { UserLimitTypeEnum } from "@src/common/emuns/UserLimitTypeEnum";
 import {
-  useCreateComplianceRecordMutation,
   useCreateComplianceRecordWithRequestMutation,
   useGetActiveUserLimitQuery,
 } from "@src/lib/redux/services/adminApi";
-import { CreateComplianceRecordReqPayload } from "@src/types/compliance-records/createComplianceRecordReqPayload";
+import { ComplianceTokenType } from "@src/types/compliance-records/complianceToken";
 import { UserLimit } from "@src/types/compliance-records/userLimit";
 import { ComplianceRequest } from "@src/types/compliance-requests/complianceRequest";
 
@@ -56,13 +55,16 @@ export default function CreateComplianceRecordModalForm({
   const [socComment, setSocComment] = useState<string>("");
   const [sowEmploymentStatus, setSowEmploymentStatus] =
     useState<EmploymentStatus>();
-  const [complianceDocuments, setComplianceDocuments] = useState<any[]>([]);
+  const [complianceDocuments, setComplianceDocuments] = useState<
+    { id: string }[]
+  >([]);
+  const [complianceTokens, setComplianceTokens] = useState<
+    ComplianceTokenType[]
+  >([]);
 
   const form = useRef<HTMLFormElement>(null);
 
   const { data } = useGetActiveUserLimitQuery(userId, { skip: !open });
-
-  const [createComplianceRecord] = useCreateComplianceRecordMutation();
 
   const [createComplianceRecordWithRequest] =
     useCreateComplianceRecordWithRequestMutation();
@@ -102,6 +104,12 @@ export default function CreateComplianceRecordModalForm({
 
     if (form.current && sofLimitType && socLimitType) {
       const formData = new FormData(form.current);
+
+      userVerificationRequestId &&
+        formData.append(
+          "userVerificationRequestId",
+          `${userVerificationRequestId}`,
+        );
 
       const userLimit: UserLimit = {
         sofLimitType,
@@ -160,6 +168,16 @@ export default function CreateComplianceRecordModalForm({
         complianceRequest.socIntentionToSell = `${socIntentionToSell}`;
       }
 
+      if (complianceTokens.length > 0) {
+        const amount = formData.getAll("tokenAmount");
+        const tokens = complianceTokens.map((token, i) => ({
+          id: token.tokenId,
+          amount: +amount[i],
+        }));
+
+        formData.append("complianceTokens", JSON.stringify(tokens));
+      }
+
       formData.append("userId", `${userId}`);
       formData.append("userLimit", JSON.stringify(userLimit));
 
@@ -173,46 +191,8 @@ export default function CreateComplianceRecordModalForm({
         .unwrap()
         .then(() => {
           toast.success("Compliance Record successfully created");
-          handleClose();
-        })
-        .catch((e) => {
-          toast.error(JSON.stringify(e?.data?.message));
-        });
-    }
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (sofLimitType && socLimitType) {
-      const payload: CreateComplianceRecordReqPayload = {
-        userId: Number(userId),
-        userLimit: {
-          sofLimitType,
-          sofOrderLimit,
-          sofTradingLimit,
-          socLimitType,
-          socOrderLimit,
-          socTradingLimit,
-        },
-      };
-
-      if (userVerificationRequestId) {
-        payload.userVerificationRequestId = Number(userVerificationRequestId);
-      }
-
-      if (sofComment) {
-        payload.sofComment = sofComment;
-      }
-
-      if (socComment) {
-        payload.socComment = socComment;
-      }
-
-      createComplianceRecord(payload)
-        .unwrap()
-        .then(() => {
-          toast.success("Compliance Record successfully created");
+          setComplianceDocuments([]);
+          setComplianceTokens([]);
           handleClose();
         })
         .catch((e) => {
@@ -228,11 +208,7 @@ export default function CreateComplianceRecordModalForm({
       </Button>
 
       <Dialog open={open} onClose={handleClose} sx={{ mt: 5 }}>
-        <Box
-          component={"form"}
-          onSubmit={withRequest ? handleSubmitWithRequest : handleSubmit}
-          ref={form}
-        >
+        <Box component={"form"} onSubmit={handleSubmitWithRequest} ref={form}>
           <DialogTitle variant="h5">Create compliance record</DialogTitle>
 
           <Divider />
@@ -371,7 +347,7 @@ export default function CreateComplianceRecordModalForm({
                 onClick={() =>
                   setComplianceDocuments((prevState) => [
                     ...prevState,
-                    { id: Date.now().toString(), type: "", file: "" },
+                    { id: Date.now().toString() },
                   ])
                 }
               >
@@ -381,7 +357,33 @@ export default function CreateComplianceRecordModalForm({
 
             <Divider sx={{ mt: 2, mb: 2 }} />
 
-            <ComplianceToken />
+            <Box>
+              <Typography>
+                <b>Compliance tokens:</b>
+              </Typography>
+
+              {complianceTokens.map((token) => (
+                <Fragment key={token.id}>
+                  <ComplianceToken
+                    currentToken={token}
+                    setComplianceTokens={setComplianceTokens}
+                  />
+                </Fragment>
+              ))}
+
+              <Button
+                sx={{ mt: 2 }}
+                variant="outlined"
+                onClick={() =>
+                  setComplianceTokens((prevState) => [
+                    ...prevState,
+                    { id: Date.now().toString(), tokenId: 0 },
+                  ])
+                }
+              >
+                Add token
+              </Button>
+            </Box>
 
             {withRequest && (
               <ComplianceRequestComponent

@@ -5,7 +5,6 @@ import { AdminsListRes } from "@src/types/adminsListRes";
 import { ChangeAdminStatusReqPayload } from "@src/types/changeAdminStatusReqPayload";
 import { ChangeUserWalletStatusReqPayload } from "@src/types/changeUserWalletStatusReqPayload";
 import { CoinMarketTokenInfo } from "@src/types/CoinMarketToken";
-import { CreateComplianceRecordReqPayload } from "@src/types/compliance-records/createComplianceRecordReqPayload";
 import { UserLimit } from "@src/types/compliance-records/userLimit";
 import { ChangeComplianceRequestStatusReqPayload } from "@src/types/compliance-requests/changeComplianceRequestStatusReqPayload";
 import { GetAllVerificationRequestsQueryParams } from "@src/types/compliance-requests/getAllVerificationRequestsQueryParams";
@@ -564,22 +563,6 @@ export const adminApi = createApi({
       providesTags: [{ type: "Admin", id: "USER-LIMIT" }],
     }),
 
-    createComplianceRecord: builder.mutation<
-      void,
-      CreateComplianceRecordReqPayload
-    >({
-      query: (body) => ({
-        url: "/compliance-record",
-        method: "POST",
-        body,
-      }),
-      invalidatesTags: [
-        { type: "Admin", id: "COMPLIANCE-REQUEST" },
-        { type: "Admin", id: "COMPLIANCE-REQUESTS" },
-        { type: "Admin", id: "COMPLIANCE-RECORDS" },
-      ],
-    }),
-
     changeComplianceRequestStatus: builder.mutation<
       void,
       ChangeComplianceRequestStatusReqPayload
@@ -601,10 +584,15 @@ export const adminApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: [
-        { type: "Admin", id: "COMPLIANCE-REQUESTS" },
-        { type: "Admin", id: "USER" },
-      ],
+      invalidatesTags: (_, error) =>
+        !error
+          ? [
+              { type: "Admin", id: "COMPLIANCE-REQUESTS" },
+              { type: "Admin", id: "USER" },
+              { type: "Admin", id: "COMPLIANCE-REQUEST" },
+              { type: "Admin", id: "COMPLIANCE-RECORDS" },
+            ]
+          : [],
     }),
   }),
 });
@@ -652,7 +640,6 @@ export const {
   useGetAllVerificationRequestsQuery,
   useGetComplianceRequestQuery,
   useGetActiveUserLimitQuery,
-  useCreateComplianceRecordMutation,
   useChangeComplianceRequestStatusMutation,
   useCreateComplianceRecordWithRequestMutation,
 } = adminApi;

@@ -12,15 +12,9 @@ import { ComplianceDocumentTypeEnum } from "@src/common/emuns/ComplianceDocument
 
 const documentTypes = Object.values(ComplianceDocumentTypeEnum);
 
-type Document = {
-  id: string;
-  type: string;
-  file: string;
-};
-
 type ComplianceDocumentProps = {
-  document: Document;
-  setDocuments: Dispatch<SetStateAction<any[]>>;
+  document: { id: string };
+  setDocuments: Dispatch<SetStateAction<{ id: string }[]>>;
 };
 
 export default function ComplianceDocument({
@@ -66,6 +60,7 @@ export default function ComplianceDocument({
         <input type="file" name="complianceDocuments" required />
 
         <DeleteIcon
+          sx={{ cursor: "pointer" }}
           color="error"
           onClick={() =>
             setDocuments((prevState) =>

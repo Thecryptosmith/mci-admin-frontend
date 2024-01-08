@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
@@ -11,13 +11,22 @@ import CircularProgress from "@mui/material/CircularProgress";
 import TextField from "@mui/material/TextField";
 import { useDebounce } from "@src/common/hooks/useDebounce";
 import { useGetTokensQuery } from "@src/lib/redux/services/adminApi";
+import { ComplianceTokenType } from "@src/types/compliance-records/complianceToken";
 import { GetTokensQueryParams } from "@src/types/getTokensQueryParams";
 import { TokenData } from "@src/types/getTokensRes";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-export default function TokenSearchSelectInput() {
+type TokenSearchSelectInputProps = {
+  currentToken?: ComplianceTokenType;
+  setTokens?: Dispatch<SetStateAction<ComplianceTokenType[]>>;
+};
+
+export default function TokenSearchSelectInput({
+  currentToken,
+  setTokens,
+}: TokenSearchSelectInputProps) {
   const [open, setOpen] = useState(false);
   const [params, setParams] = useState<GetTokensQueryParams | null>({
     limit: 10,
@@ -32,6 +41,22 @@ export default function TokenSearchSelectInput() {
   });
 
   const loading = open && (isLoading || isFetching);
+
+  useEffect(() => {
+    if (selectedValue && setTokens && currentToken) {
+      setTokens((prevState) =>
+        prevState.map((token) => {
+          if (currentToken.id === token.id) {
+            token.tokenId = selectedValue.id;
+
+            return token;
+          }
+
+          return token;
+        }),
+      );
+    }
+  }, [currentToken, selectedValue, setTokens]);
 
   useEffect(() => {
     if (debouncedInputValue) {
@@ -65,7 +90,7 @@ export default function TokenSearchSelectInput() {
       }}
       disableCloseOnSelect
       id="assets-select"
-      sx={{ width: 250 }}
+      sx={{ width: 600 }}
       open={open}
       onOpen={() => {
         setOpen(true);
@@ -104,6 +129,8 @@ export default function TokenSearchSelectInput() {
         <TextField
           {...params}
           label={"Token"}
+          required
+          name="token"
           InputProps={{
             ...params.InputProps,
             endAdornment: (
